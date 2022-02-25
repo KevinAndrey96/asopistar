@@ -1,11 +1,35 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
 
-@section('content')
+    <title>Asopistar</title>
+    
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
+    <meta name="author" content="Xiaoying Riley at 3rd Wave Media">    
+    <link rel="shortcut icon" href="/favicon.ico"> 
+    
+    <!-- FontAwesome JS-->
+    <script defer src="/assets/plugins/fontawesome/js/all.min.js"></script>
+    
+    <!-- App CSS -->  
+    <link id="theme-style" rel="stylesheet" href="/assets/css/portal.css">
+
+</head> 
+
+<body class="app app-login p-0">    	
+</br>
+</br>
+</br>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+                <div class="card-header">{{ __('Restaurar Contraseña') }}</div>
 
                 <div class="card-body">
                     @if (session('status'))
@@ -18,7 +42,7 @@
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('Direccion de Correo') }}</label>
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
@@ -34,8 +58,9 @@
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
+                                    {{ __('Enviar') }}
                                 </button>
+                                <a class="btn btn-primary" href="{{ url('/') }}"> Regresar</a>
                             </div>
                         </div>
                     </form>
@@ -44,4 +69,6 @@
         </div>
     </div>
 </div>
-@endsection
+
+</body>
+</html> 

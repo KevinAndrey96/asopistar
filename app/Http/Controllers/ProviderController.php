@@ -63,7 +63,7 @@ class ProviderController extends Controller
         Provider::insert($dataProvider);
 
         //return response()->json($dataProvider);
-        return redirect('provider')->with('mensaje', 'Especie agregada con éxito');
+        return redirect('provider')->with('mensaje', 'Proveedor agregado con éxito');
     }
 
     /**
@@ -122,7 +122,7 @@ class ProviderController extends Controller
         //buscamos registro con el id que pasamos y actualizamos
         Provider::where('id', '=', $id)->update( $dataProvider);
         $provider=Provider::findOrFail($id);
-        return redirect('provider')->with('mensaje', 'Especie modificado');
+        return redirect('provider')->with('mensaje', 'Proveedor modificado');
     }
 
     /**
@@ -136,6 +136,6 @@ class ProviderController extends Controller
         //
         $provider=Provider::findOrFail($id);
         Provider::destroy($id);
-        return redirect('provider')->with('mensaje', 'Especie borrada');
+        return redirect('provider')->with('mensaje', 'Proveedor borrado');
     }
 }

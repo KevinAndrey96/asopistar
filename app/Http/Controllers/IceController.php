@@ -81,8 +81,9 @@ class IceController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $ices = Ice::where('user_id', '=', $id)->get();
-            return view('ice.index', compact('ices', 'id'));
+            $ices = Ice::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('ice.index', compact('ices', 'userid'));
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $ices = Ice::where('pond_id', '=', $id)->get();   

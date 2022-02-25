@@ -5,10 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Pond;
 use App\Models\Alevin;
 use App\Models\User;
+use App\Models\Feeding;
+use App\Models\Ice;
+use App\Models\Harvest;
+use App\Models\Weight;
+use App\Models\Sanitary;
 use App\Models\Specie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use PDF;    
 
 class PondController extends Controller
 {
@@ -21,10 +27,10 @@ class PondController extends Controller
     {
         //
         if (Auth::user()->rol == 'piscicultor'){
-            //$data['ponds'] = Pond::where('user_id', '=', Auth::user()->id)->get();
-            $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
+            $ponds = Pond::where([['user_id', '=', Auth::user()->id],['is_enabled', '=', '1']])->get();
             foreach ($ponds as $pond) {
                 $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
+                //dd($alevin);
                 if ($alevin){
                     $fechaAntigua  = $alevin->date_of_entry;
                     $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
@@ -58,6 +64,62 @@ class PondController extends Controller
 
     }
 
+    public function report($id)
+    {
+        //
+        if (Auth::user()->rol == 'piscicultor'){
+            $user=User::findOrFail(Auth::user()->id);
+            $user->date = Carbon::now()->format('Y-m-d');
+            $ponds=Pond::where('id', '=', $id)->get();
+            foreach ($ponds as $pond) {
+                $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
+                $pondcode = $pond->pondcode;
+                if ($alevin){
+                    $alevin->exist = '1';
+                    $fechaAntigua  = $alevin->date_of_entry;
+                    $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+                    $fechaNueva  =  Carbon::now();
+                    $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
+                    $pond->age = $cantidadDias;
+                    
+                    $specie = $alevin->species;
+                    $especies = Specie::where('species', '=', $specie)->first();
+                    $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
+                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+
+                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                        $pond->stage = 'Cria';
+                    }
+                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                        $pond->stage = 'Levante';
+                    }
+                    if ($cantidadDias >= $baitStart){
+                        $pond->stage = 'Cebo';
+                    }
+                    $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    $ices = Ice::where('pond_id', '=' , $pond->id)->get();
+                    $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
+                    $weights = Weight::where('pond_id', '=' , $pond->id)->get();
+                    $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get(); 
+
+                }
+                else {
+                    $alevin->exist = '0';
+                    $pond->age = 'N/A';
+                    $pond->stage = 'N/A';
+                }
+            }
+            $user->title = 'Reporte: Estanque_'.$pondcode.' '.$user->name.' '.$user->lastname.' '.$user->date;
+            $pdf = PDF::loadView('pond.report', ['user'=>$user, 'ponds'=>$ponds, 'alevin'=>$alevin, 'feedings'=>$feedings, 'ices'=>$ices, 'harvests'=>$harvests, 'weights'=>$weights, 'sanitaries'=>$sanitaries]);//->setPaper('letter', 'landscape');
+            $pdf->download($user->title.'.pdf');
+            return $pdf->stream($user->title.'.pdf');
+            //return view('pond.index', compact('user', 'ponds'));
+        }
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -79,6 +141,7 @@ class PondController extends Controller
     {
         //
         $campos=[
+            'pondcode'=>'required',
             'pond_area'=>'required|Numeric|min:1.0',//area
             'water'=>'required|Numeric|min:1.0',//aforo de agua
             'tools'=>'required|string|max:225',//equipo
@@ -175,6 +238,7 @@ class PondController extends Controller
     {
         //
         $campos=[
+            'pondcode'=>'required',
             'pond_area'=>'required|Numeric|min:1.0',//area
             'water'=>'required|Numeric|min:1.0',//aforo de agua
             'tools'=>'required|string|max:225',//equipo
@@ -207,8 +271,63 @@ class PondController extends Controller
     public function destroy($id)
     {
         //
-        $pond=Pond::findOrFail($id);
-        Pond::destroy($id);
-        return redirect('pond')->with('mensaje', 'Estanque borrado');
+        //$pond=Pond::findOrFail($id);
+        //Pond::destroy($id);
+        //return redirect('pond')->with('mensaje', 'Estanque borrado');
+
+        if (Auth::user()->rol == 'piscicultor'){
+            $user=User::findOrFail(Auth::user()->id);
+            $user->date = Carbon::now()->format('Y-m-d');
+            $ponds=Pond::where('id', '=', $id)->get();
+            foreach ($ponds as $pond) {
+                $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
+                $pondcode = $pond->pondcode;
+                if ($alevin){
+                    $alevin->exist = '1';
+                    $fechaAntigua  = $alevin->date_of_entry;
+                    $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+                    $fechaNueva  =  Carbon::now();
+                    $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
+                    $pond->age = $cantidadDias;
+                    
+                    $specie = $alevin->species;
+                    $especies = Specie::where('species', '=', $specie)->first();
+                    $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
+                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+
+                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                        $pond->stage = 'Cria';
+                    }
+                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                        $pond->stage = 'Levante';
+                    }
+                    if ($cantidadDias >= $baitStart){
+                        $pond->stage = 'Cebo';
+                    }
+                    $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    $ices = Ice::where('pond_id', '=' , $pond->id)->get();
+                    $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
+                    $weights = Weight::where('pond_id', '=' , $pond->id)->get();
+                    $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get(); 
+
+                }
+                else {
+                    $alevin->exist = '0';
+                    $pond->age = 'N/A';
+                    $pond->stage = 'N/A';
+                }
+            }
+            $user->title = 'Reporte: Estanque_'.$pondcode.' '.$user->name.' '.$user->lastname.' '.$user->date;
+            $dataPond['is_enabled'] = 0;
+            Pond::where('id', '=', $id)->update( $dataPond);
+            $pond=Pond::findOrFail($id);
+
+            $pdf = PDF::loadView('pond.report', ['user'=>$user, 'ponds'=>$ponds, 'alevin'=>$alevin, 'feedings'=>$feedings, 'ices'=>$ices, 'harvests'=>$harvests, 'weights'=>$weights, 'sanitaries'=>$sanitaries]);
+            //$pdf->save(storage_path().'/pdf/'.$user->title.'.pdf');//stream($user->title.'.pdf');
+            return $pdf->stream($user->title.'.pdf');
+            //return redirect('pond')->with('mensaje', 'Estanque borrado');
+        }
     }
 }

@@ -12,6 +12,8 @@ use App\Http\Controllers\PondController;
 use App\Http\Controllers\SpecieController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\FoodbrandController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
@@ -24,9 +26,13 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::resource('user', PiscicultorController::class)->middleware('auth');
+Route::get('user/report', [PiscicultorController::class, 'globalReport'])->middleware('auth');
+Route::resource('user', PiscicultorController::class)->middleware('auth')->except(['globalReport']);
+Route::get('user/report/{id}', [PiscicultorController::class, 'report'])->middleware('auth');
+Route::get('user/edit/password/{id}', [PiscicultorController::class, 'changePassword'])->middleware('auth');
 
 Route::resource('pond', PondController::class)->middleware('auth');
+Route::get('pond/report/{id}', [PondController::class, 'report'])->middleware('auth');
 
 Route::resource('alevin', AlevinController::class)->middleware('auth');
 Route::get('alevin/create/{id}', [AlevinController::class, 'create'])->middleware('auth');
@@ -52,6 +58,9 @@ route::resource('provider', ProviderController::class)->middleware('auth');
 
 route::resource('foodbrand', FoodbrandController::class)->middleware('auth');
 
+route::resource('blog', BlogController::class)->middleware('auth');
+
+route::resource('product', ProductController::class)->middleware('auth');
 
 Auth::routes();//['register'=>false,'reset'=>false]
 

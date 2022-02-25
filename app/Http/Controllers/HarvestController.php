@@ -87,8 +87,9 @@ class HarvestController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $harvests = Harvest::where('user_id', '=', $id)->get();
-            return view('harvest.index', compact('harvests', 'id'));
+            $harvests = Harvest::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('harvest.index', compact('harvests', 'userid'));
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $harvests = Harvest::where('pond_id', '=', $id)->get();   

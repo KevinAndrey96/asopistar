@@ -32,9 +32,11 @@ class FeedingController extends Controller
     public function create($pond_id)
     {
         //
-        $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
-        $foodbrands = Foodbrand::all();
-        return view('feeding.create', compact('ponds', 'foodbrands', 'pond_id'));
+        if (Auth::user()->rol == 'piscicultor'){
+            $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
+            $foodbrands = Foodbrand::all();
+            return view('feeding.create', compact('ponds', 'foodbrands', 'pond_id'));
+        }
     }
 
     /**
@@ -89,7 +91,9 @@ class FeedingController extends Controller
             $dataFeeding['stage'] = 'Cebo';
         }
 
-        $dataFeeding['protein'] = Foodbrand::where('name', '=', $dataFeeding['mark'])->firstOrFail()->protein;
+        $dataFeeding['protein'] = Foodbrand::where('id', '=', $dataFeeding['mark'])->firstOrFail()->protein;
+        $dataFeeding['mark'] = Foodbrand::where('id', '=', $dataFeeding['mark'])->firstOrFail()->name;
+
         $pond_id=$dataFeeding['pond_id'];
         Feeding::insert($dataFeeding);
 
@@ -107,8 +111,9 @@ class FeedingController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $feedings = Feeding::where('user_id', '=', $id)->get();
-            return view('feeding.index', compact('feedings', 'id'));
+            $feedings = Feeding::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('feeding.index', compact('feedings', 'userid'));
         }  
         if (Auth::user()->rol == 'piscicultor'){
             $feedings = Feeding::where('pond_id', '=', $id)->get();     
@@ -126,11 +131,13 @@ class FeedingController extends Controller
     public function edit($id)
     {
         //
-        $feeding = Feeding::findOrFail($id);
-        $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
-        $foodbrands = Foodbrand::all();
-        $pond_id = Feeding::findOrFail($id)->pond_id;
-        return view('feeding.edit', compact('feeding', 'ponds', 'foodbrands', 'pond_id'));
+        if (Auth::user()->rol == 'piscicultor'){
+            $feeding = Feeding::findOrFail($id);
+            $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
+            $foodbrands = Foodbrand::all();
+            $pond_id = Feeding::findOrFail($id)->pond_id;
+            return view('feeding.edit', compact('feeding', 'ponds', 'foodbrands', 'pond_id'));
+        }
     }
 
     /**
@@ -188,8 +195,9 @@ class FeedingController extends Controller
         if ($cantidadDias >= $baitStart){
             $dataFeeding['stage'] = 'Cebo';
         }
-
-        $dataFeeding['protein'] = Foodbrand::where('name', '=', $dataFeeding['mark'])->firstOrFail()->protein;
+        $dataFeeding['protein'] = Foodbrand::where('id', '=', $dataFeeding['mark'])->firstOrFail()->protein;
+        $dataFeeding['mark'] = Foodbrand::where('id', '=', $dataFeeding['mark'])->firstOrFail()->name;
+        
         
         //buscamos registro con el id que pasamos y actualizamos
         Feeding::where('id', '=', $id)->update( $dataFeeding);
@@ -207,9 +215,11 @@ class FeedingController extends Controller
     public function destroy($id)
     {
         //
-        $feeding=Feeding::findOrFail($id);
-        $pond_id = Feeding::findOrFail($id)->pond_id;
-        Feeding::destroy($id);
-        return redirect('feeding/'.$pond_id)->with('mensaje', 'Alimentación borrado');
+        if (Auth::user()->rol == 'piscicultor'){
+            $feeding=Feeding::findOrFail($id);
+            $pond_id = Feeding::findOrFail($id)->pond_id;
+            Feeding::destroy($id);
+            return redirect('feeding/'.$pond_id)->with('mensaje', 'Alimentación borrado');
+        }
     }
 }
