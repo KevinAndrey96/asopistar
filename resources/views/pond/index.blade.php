@@ -19,8 +19,8 @@
         <thead class="thead-light">
             <tr>
                 <th>Piscicultor</th>
-                <th># de Estanque</th>
-                <th>脕rea de Estanque</th>
+                <th>Código de Estanque</th>
+                <th>Volumen de Estanque</th>
                 <th>Aforo de agua</th>
                 <th>Equipos</th>
 				<th>Edad</th>
@@ -33,10 +33,10 @@
             @foreach( $ponds as $pond )
             <tr>
                 <td>
-                    {{ $pond->user->name }}
+                    {{ $pond->user->name.' '.$pond->user->lastname }}
                 </td>
-                <td>{{ $pond->id }}</td>
-                <td>{{ $pond->pond_area }} m<sup>2</sup></td>
+                <td>{{ $pond->pondcode }}</td>
+                <td>{{ $pond->pond_area }} m<sup>3</sup></td>
                 <td>{{ $pond->water }} lt/min</td>
                 <td>{{ $pond->tools }}</td>
                 <td>{{ $pond->age }} semanas</td>
@@ -71,7 +71,7 @@
  										<path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-.623l-1.844 6.456a.75.75 0 0 1-.722.544H3.69a.75.75 0 0 1-.722-.544L1.123 8H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6h1.717L5.07 1.243a.5.5 0 0 1 .686-.172zM2.163 8l1.714 6h8.246l1.714-6H2.163z"/>
 									</svg>
 								</span>
-								<span class="nav-link-text">Alimentaci贸n</span>
+								<span class="nav-link-text">Alimentación</span>
 							</a><!--//nav-link-->
 						</li><!--//nav-item-->
 
@@ -126,16 +126,33 @@
                     </div>
                 </div><!--//app-user-dropdown--> 
                 
+				</br>
                 <a href="{{ url('/pond/'.$pond->id.'/edit') }}" class="btn btn-warning">
-                    Editar
+                	<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+							<path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+						</svg>
+					</span>
+                </a>
+				<a href="{{ url('/pond/report/'.$pond->id) }}" class="btn btn-success" target="_blank">
+                	<span class="nav-icon">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text" viewBox="0 0 16 16">
+							<path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+							<path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+						</svg>
+					</span>    
                 </a>
                     
-                <form action="{{ url('/pond/'.$pond->id ) }}" class="d-inline" method="post">
-                    @csrf
-                    {{ method_field('DELETE') }}
-                    <input class="btn btn-danger" type="submit" onclick="return confirm('驴Quieres borrar?')" 
-                    value="Borrar">
-
+                <form action="{{ url('/pond/'.$pond->id ) }}" class="d-inline" method="post">	  
+						@csrf
+						{{ method_field('DELETE') }}
+						<button type="submit" class="btn btn-danger"onclick="return confirm('¿Quieres Finalizar el Estanque?')">
+							<span class="nav-icon">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-flag-fill" viewBox="0 0 16 16">
+ 									<path d="M14.778.085A.5.5 0 0 1 15 .5V8a.5.5 0 0 1-.314.464L14.5 8l.186.464-.003.001-.006.003-.023.009a12.435 12.435 0 0 1-.397.15c-.264.095-.631.223-1.047.35-.816.252-1.879.523-2.71.523-.847 0-1.548-.28-2.158-.525l-.028-.01C7.68 8.71 7.14 8.5 6.5 8.5c-.7 0-1.638.23-2.437.477A19.626 19.626 0 0 0 3 9.342V15.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 1 0v.282c.226-.079.496-.17.79-.26C4.606.272 5.67 0 6.5 0c.84 0 1.524.277 2.121.519l.043.018C9.286.788 9.828 1 10.5 1c.7 0 1.638-.23 2.437-.477a19.587 19.587 0 0 0 1.349-.476l.019-.007.004-.002h.001"/>
+								</svg>
+							</span>  
+						</button>
                 </form>
 
                 </td>

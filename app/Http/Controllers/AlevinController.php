@@ -9,6 +9,7 @@ use App\Models\Specie;
 use App\Models\Provider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AlevinController extends Controller
 {
@@ -30,10 +31,14 @@ class AlevinController extends Controller
     public function create($pond_id)
     {
         //
-        $ponds = Pond::where('user_id', '=', Auth::user()->pond_id)->get();
-        $species = Specie::all();
-        $providers = Provider::all();
-        return view('alevin.create', compact('ponds', 'species', 'providers', 'pond_id'));
+        if (Auth::user()->rol == 'piscicultor'){
+            $alevin = Alevin::where('pond_id','=', $pond_id)->get();
+            if(!$alevin){
+                $species = Specie::all();
+                $providers = Provider::all();
+                return view('alevin.create', compact('species', 'providers', 'pond_id'));
+            }
+        }
     }
 
 
@@ -79,13 +84,27 @@ class AlevinController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $alevins = Alevin::where('user_id', '=', $id)->get();
-            return view('alevin.index', compact('alevins', 'id'));
+            $alevins = Alevin::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('alevin.index', compact('alevins', 'userid'));
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $alevins = Alevin::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;         
-            return view('alevin.index', compact('alevins', 'pond_id'));
+            $pond_id=$id;      
+            if($alevins){
+                $alevinexist=1;
+            }else{
+                $alevinexist=0;
+            }
+            foreach($alevins as $alevin){
+                $fechaAntigua  = $alevin->date_of_entry;
+                $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+                $fechaNueva  =  Carbon::now();
+                $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
+                $age = $cantidadDias;
+                $alevin->age = $age;
+            }
+            return view('alevin.index', compact('alevins', 'pond_id', 'alevinexist'));
         }    
     }
 
@@ -98,12 +117,14 @@ class AlevinController extends Controller
     public function edit($id)//Alevin $alevin)
     {
         //
-        $alevin=Alevin::findOrFail($id);
-        $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
-        $species = Specie::all();
-        $providers = Provider::all();
-        $pond_id = Alevin::findOrFail($id)->pond_id;
-        return view('alevin.edit', compact('alevin', 'ponds', 'species', 'providers', 'pond_id'));
+        if (Auth::user()->rol == 'piscicultor'){
+            $alevin=Alevin::findOrFail($id);
+            $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
+            $species = Specie::all();
+            $providers = Provider::all();
+            $pond_id = Alevin::findOrFail($id)->pond_id;
+            return view('alevin.edit', compact('alevin', 'ponds', 'species', 'providers', 'pond_id'));
+        }
     }
 
     /**
@@ -150,9 +171,11 @@ class AlevinController extends Controller
     public function destroy($id)//Alevin $alevin)
     {
         //
-        $alevin=Alevin::findOrFail($id);
-        $pond_id = Alevin::findOrFail($id)->pond_id;
-        Alevin::destroy($id);
-        return redirect('alevin/'.$pond_id)->with('mensaje', 'Alevin borrado');
+        if (Auth::user()->rol == 'piscicultor'){
+            $alevin=Alevin::findOrFail($id);
+            $pond_id = Alevin::findOrFail($id)->pond_id;
+            Alevin::destroy($id);
+            return redirect('alevin/'.$pond_id)->with('mensaje', 'Alevin borrado');
+        }
     }
 }

@@ -1,4 +1,4 @@
-<h1>{{ $modo }} Estanques </h1>
+<h1>{{ $modo }} Estanque </h1>
 
 @if(count($errors)>0)
 
@@ -13,7 +13,12 @@
 @endif
 
 <div class="form-group">
-    <label for="pond_area"> Área del estanque m<sup>2</sup></label>
+    <label for="pondcode"> Código de Estanque </label>
+    <input type="text" class="form-control" name="pondcode" value="{{ isset($pond->pondcode)?$pond->pondcode:old('pondcode') }}" id="pondcode" placeholder="Código">
+</div>
+
+<div class="form-group">
+    <label for="pond_area"> Volumen del estanque m<sup>3</sup></label>
     <input type="number" class="form-control" name="pond_area" value="{{ isset($pond->pond_area)?$pond->pond_area:old('pond_area') }}" id="pond_area" step="0.01" min = "1.0" placeholder="Área">
 </div>
 

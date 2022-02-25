@@ -75,8 +75,9 @@ class SanitaryController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $sanitaries = Sanitary::where('user_id', '=', $id)->get();
-            return view('sanitary.index', compact('sanitaries', 'id'));
+            $sanitaries = Sanitary::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('sanitary.index', compact('sanitaries', 'userid'));
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $sanitaries = Sanitary::where('pond_id', '=', $id)->get();   

@@ -27,7 +27,7 @@
     <label for="mark"> Marca </label>
     <select id="mark" name="mark" class="form-select" aria-label="Default select example">
         @foreach( $foodbrands as $foodbrand )
-            <option value="{{ $foodbrand->name }}" > {{ $foodbrand->name }} </option>
+            <option value="{{ $foodbrand->id }}" > {{ $foodbrand->name }} ({{ $foodbrand->protein }}%)</option>
         @endforeach
     </select>
 </div>

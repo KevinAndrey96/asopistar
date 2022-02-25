@@ -4,18 +4,20 @@
 
 
 <div class="container">
-<h1>Estanques </h1>
+    <h1> Estanque </h1>
+    <br/>
     <form action="{{ url('/user/'.$user->id) }}" method="get" enctype="multipart/form-data"> 
         <table id= "my_table" class="table table-light">
             <thead class="thead-light">
                 <tr>
                     <th>Piscicultor</th>
                     <th># de Estanque</th>
-                    <th>Área de Estanque</th>
+                    <th>Volumen de Estanque</th>
                     <th>Aforo de agua</th>
                     <th>Equipos</th>
                     <th>Edad</th>
                     <th>Etapa</th>
+                    <th>Finalizado</th>
                     <th>Acciones</th>
 
                 </tr>
@@ -25,14 +27,21 @@
                 @foreach( $ponds as $pond )
                 <tr>
                     <td>
-                        {{ $pond->user->name }}
+                        {{ $pond->user->name.' '.$pond->user->lastname }}
                     </td>
-                    <td>{{ $pond->id }}</td>
-                    <td>{{ $pond->pond_area }} Km2</td>
+                    <td>{{ $pond->pondcode }}</td>
+                    <td>{{ $pond->pond_area }} m<sup>3</sup></td>
                     <td>{{ $pond->water }} lt/min</td>
                     <td>{{ $pond->tools }}</td>
                     <td>{{ $pond->age }} semanas</td>
                     <td>{{ $pond->stage }}</td>
+                    <td>
+                    @if($pond->is_enabled ==1)
+                        No
+                    @else
+                        Si
+                    @endif
+                    </td>
                     <td>
 
                         <div class="app-utility-item app-user-dropdown dropdown">
@@ -42,7 +51,7 @@
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/alevin/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/alevin/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-egg" viewBox="0 0 16 16">
                                                 <path d="M8 15a5 5 0 0 1-5-5c0-1.956.69-4.286 1.742-6.12.524-.913 1.112-1.658 1.704-2.164C7.044 1.206 7.572 1 8 1c.428 0 .956.206 1.554.716.592.506 1.18 1.251 1.704 2.164C12.31 5.714 13 8.044 13 10a5 5 0 0 1-5 5zm0 1a6 6 0 0 0 6-6c0-4.314-3-10-6-10S2 5.686 2 10a6 6 0 0 0 6 6z"/>
@@ -54,7 +63,7 @@
 
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/feeding/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/feeding/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-basket2" viewBox="0 0 16 16">
                                                 <path d="M4 10a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0v-2zm3 0a1 1 0 0 1 2 0v2a1 1 0 0 1-2 0v-2zm3 0a1 1 0 1 1 2 0v2a1 1 0 0 1-2 0v-2z"/>
@@ -67,7 +76,7 @@
 
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/ice/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/ice/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-snow" viewBox="0 0 16 16">
                                                 <path d="M8 16a.5.5 0 0 1-.5-.5v-1.293l-.646.647a.5.5 0 0 1-.707-.708L7.5 12.793V8.866l-3.4 1.963-.496 1.85a.5.5 0 1 1-.966-.26l.237-.882-1.12.646a.5.5 0 0 1-.5-.866l1.12-.646-.884-.237a.5.5 0 1 1 .26-.966l1.848.495L7 8 3.6 6.037l-1.85.495a.5.5 0 0 1-.258-.966l.883-.237-1.12-.646a.5.5 0 1 1 .5-.866l1.12.646-.237-.883a.5.5 0 1 1 .966-.258l.495 1.849L7.5 7.134V3.207L6.147 1.854a.5.5 0 1 1 .707-.708l.646.647V.5a.5.5 0 1 1 1 0v1.293l.647-.647a.5.5 0 1 1 .707.708L8.5 3.207v3.927l3.4-1.963.496-1.85a.5.5 0 1 1 .966.26l-.236.882 1.12-.646a.5.5 0 0 1 .5.866l-1.12.646.883.237a.5.5 0 1 1-.26.966l-1.848-.495L9 8l3.4 1.963 1.849-.495a.5.5 0 0 1 .259.966l-.883.237 1.12.646a.5.5 0 0 1-.5.866l-1.12-.646.236.883a.5.5 0 1 1-.966.258l-.495-1.849-3.4-1.963v3.927l1.353 1.353a.5.5 0 0 1-.707.708l-.647-.647V15.5a.5.5 0 0 1-.5.5z"/>
@@ -79,7 +88,7 @@
 
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/harvest/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/harvest/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
@@ -92,7 +101,7 @@
 
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/weight/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/weight/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-boxes" viewBox="0 0 16 16">
                                                 <path d="M7.752.066a.5.5 0 0 1 .496 0l3.75 2.143a.5.5 0 0 1 .252.434v3.995l3.498 2A.5.5 0 0 1 16 9.07v4.286a.5.5 0 0 1-.252.434l-3.75 2.143a.5.5 0 0 1-.496 0l-3.502-2-3.502 2.001a.5.5 0 0 1-.496 0l-3.75-2.143A.5.5 0 0 1 0 13.357V9.071a.5.5 0 0 1 .252-.434L3.75 6.638V2.643a.5.5 0 0 1 .252-.434L7.752.066ZM4.25 7.504 1.508 9.071l2.742 1.567 2.742-1.567L4.25 7.504ZM7.5 9.933l-2.75 1.571v3.134l2.75-1.571V9.933Zm1 3.134 2.75 1.571v-3.134L8.5 9.933v3.134Zm.508-3.996 2.742 1.567 2.742-1.567-2.742-1.567-2.742 1.567Zm2.242-2.433V3.504L8.5 5.076V8.21l2.75-1.572ZM7.5 8.21V5.076L4.75 3.504v3.134L7.5 8.21ZM5.258 2.643 8 4.21l2.742-1.567L8 1.076 5.258 2.643ZM15 9.933l-2.75 1.571v3.134L15 13.067V9.933ZM3.75 14.638v-3.134L1 9.933v3.134l2.75 1.571Z"/>
@@ -104,7 +113,7 @@
 
                                 <li class="nav-item">
                                     <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                                    <a class="nav-link" href="{{ url('/sanitary/'.$user->id) }}">
+                                    <a class="nav-link" href="{{ url('/sanitary/'.$pond->id) }}">
                                         <span class="nav-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-octagon" viewBox="0 0 16 16">
                                                 <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>
@@ -133,5 +142,6 @@
     </form>   
     <br>
     <a class="btn btn-primary" href="{{ url('/admin') }}"> Regresar</a>
+    <a href="{{ url('user/report/'.$user->id ) }}" class="btn btn-success"> Reporte </a>
 </div>
 @endsection

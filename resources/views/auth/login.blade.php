@@ -33,7 +33,7 @@
                         @csrf         
 							<div class="email mb-3">
 								<label class="sr-only" for="signin-email">{{ __('E-Mail Address') }}</label>
-								<input id="email" type="email" style="text-transform: lowercase" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Correo electrónico">
+								<input id="email" type="email" style="text-transform: lowercase" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Correo Electrónico">
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
@@ -59,9 +59,9 @@
 											</label>
 										</div>
 									</div><!--//col-6-->
-									<!--/*<div class="col-6">
+									<div class="col-6">
 										<div class="forgot-password text-end">
-											<a href="{{ route('password.request') }}">{{ __('Forgot Your Password?') }}</a>
+											<a href="{{ route('password.request') }}">{{ __('¿Olvidaste tu contraseña?') }}</a>
 										</div>
 									</div><!--//col-6-->
 								</div><!--//extra-->

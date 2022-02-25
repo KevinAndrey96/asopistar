@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Weight;
 use App\Models\User;
 use App\Models\Pond;
+use App\Models\Alevin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class WeightController extends Controller
 {
@@ -29,7 +31,13 @@ class WeightController extends Controller
     {
         //
         $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
-        return view('weight.create', compact('ponds', 'pond_id'));
+        $alevin = Alevin::where('pond_id', '=', $pond_id)->first();
+        $fechaAntigua  = $alevin->date_of_entry;
+        $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+        $fechaNueva  =  Carbon::now();
+        $week = $fechaAntigua->diffInWeeks($fechaNueva);
+        $pondFishes = $alevin->amount;
+        return view('weight.create', compact('ponds', 'pond_id', 'week', 'pondFishes'));
     }
 
     /**
@@ -58,12 +66,11 @@ class WeightController extends Controller
 
         $dataWeight = request()->except('_token');
 
+        $pond_id=$dataWeight['pond_id'];
         //$dataWeight['number_of_fish'] = Alevin::where('user_id', '=', Auth::user()->id)->firstOrFail()->amount;
         $dataWeight['average_weight'] = round($dataWeight['total_weight']*1000/$dataWeight['fish_number'], 2); 
         $dataWeight['user_id'] = Auth::user()->id; //add request
         //dd($dataWeight);
-        //$dataPiscicultor=request->all();
-        $pond_id=$dataWeight['pond_id'];
         Weight::insert($dataWeight);
 
         //return response()->json($dataWeight);
@@ -80,8 +87,9 @@ class WeightController extends Controller
     {
         //
         if (Auth::user()->rol == 'administrador'){
-            $weights = Weight::where('user_id', '=', $id)->get();
-            return view('weight.index', compact('weights', 'id'));
+            $weights = Weight::where('pond_id', '=', $id)->get();
+            $userid = Pond::where('id', '=', $id)->first()->user_id;
+            return view('weight.index', compact('weights', 'userid'));
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $weights = Weight::where('pond_id', '=', $id)->get();   
@@ -102,7 +110,13 @@ class WeightController extends Controller
         $weight=Weight::findOrFail($id);
         $ponds = Pond::where('user_id', '=', Auth::user()->id)->get();
         $pond_id = Weight::findOrFail($id)->pond_id;
-        return view('weight.edit', compact('weight', 'ponds', 'pond_id'));
+        $alevin = Alevin::where('pond_id', '=', $pond_id)->first();
+        $fechaAntigua  = $alevin->date_of_entry;
+        $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+        $fechaNueva  =  Carbon::now();
+        $week = $fechaAntigua->diffInWeeks($fechaNueva);
+        $pondFishes = $alevin->amount;
+        return view('weight.edit', compact('weight', 'ponds', 'pond_id', 'week', 'pondFishes'));
     }
 
     /**
@@ -128,14 +142,13 @@ class WeightController extends Controller
         ];
 
         $this->validate($request, $campos, $mensaje);
-        
+        $pond_id = Weight::findOrFail($id)->pond_id;
         //recolecta datos
         $dataWeight= request()->except(['_token','_method']);
         $dataWeight['average_weight'] = round($dataWeight['total_weight']*1000/$dataWeight['fish_number'], 2); 
         
         //buscamos registro con el id que pasamos y actualizamos
         Weight::where('id', '=', $id)->update( $dataWeight);
-        $pond_id = Weight::findOrFail($id)->pond_id;
         $weight=Weight::findOrFail($id);
         //return view('Weight.edit', compact('Weight'));
         return redirect('weight/'.$pond_id)->with('mensaje', 'Pesajes modificado');
