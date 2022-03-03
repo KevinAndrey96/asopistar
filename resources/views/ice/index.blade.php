@@ -13,8 +13,11 @@
     @if(Auth::user()->rol == 'administrador') 
     <h1>Suministro de hielo</h1>
     @endif
-    @if(Auth::user()->rol == 'piscicultor')     
+    @if(Auth::user()->rol == 'piscicultor' && $alevinExist == 1) 
     <a href="{{ url('ice/create/'.$pond_id) }}" class="btn btn-success" > Registro de suministro de hielo</a>
+    @elseif(Auth::user()->rol == 'piscicultor' && $alevinExist == 0)
+    <h1>Registro de suministro de hielo</h1>
+    <h4>Este estanque no tiene alevines</h4>
     @endif
     <br/>
     <br/>
@@ -47,7 +50,7 @@
                     {{ $ice->pond->pondcode }}
                 </td>
                 <td>{{ $ice->species }}</td>
-                <td>{{ $ice->fishing_amount }} Ton</td>
+                <td>{{ $ice->fishing_amount }} Kg</td>
                 <td>{{ $ice->sacrifice_amount }} kg</td>
                 <td>{{ $ice->cooled_amount }} kg</td>
                 <td>{{ $ice->transport_amount }} kg</td>

@@ -53,8 +53,11 @@
 
 	</tbody>
 </table>
-
-@if($alevin->exist == '1')
+@if($pond->alevinExist == '0')
+<p style="line-height: 100%; margin-top: 0.17in; margin-bottom: 0.17in">
+<font size="4" style="font-size: 14pt"><b>No hay alevines</b></font></p>
+@endif
+@if($pond->alevinExist == '1')
 <p style="line-height: 100%; margin-top: 0.17in; margin-bottom: 0.17in">
 <font size="4" style="font-size: 14pt"><b>Alevines</b></font></p>
 
@@ -80,7 +83,7 @@
 </table>
 
 <p style="line-height: 100%; margin-top: 0.17in; margin-bottom: 0.17in">
-<font size="4" style="font-size: 14pt"><b>Alimentacion</b></font></p>
+<font size="4" style="font-size: 14pt"><b>{{'Alimentación, Total: '.$user->foodcount.' kg'}}</b></font></p>
 
 <table class="table table-light" border="1">
 	<thead class="thead-light">
@@ -111,7 +114,9 @@
 </table>
 
 <p style="line-height: 100%; margin-top: 0.17in; margin-bottom: 0.17in">
-<font size="4" style="font-size: 14pt"><b>Hielo</b></font></p>
+<font size="4" style="font-size: 14pt"><b>
+	{{'Hielo, Total Sacrificio: '.$user->iceSacrificecount.' kg, Enfriado: '.$user->iceCooledcount.' kg, Transporte: '.$user->iceTransportcount.' kg'}}
+</b></font></p>
 
 <table class="table table-light" border="1">
 	<thead class="thead-light">

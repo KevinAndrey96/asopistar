@@ -42,7 +42,7 @@
                 <td>{{ $pond->age }} semanas</td>
                 <td>{{ $pond->stage }}</td>
 
-                @if(Auth::user()->rol == 'piscicultor') 
+                @if(Auth::user()->rol == 'piscicultor' && $pond->is_enabled == 1) 
                 <td>
 
                 <div class="app-utility-item app-user-dropdown dropdown">

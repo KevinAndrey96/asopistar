@@ -13,8 +13,11 @@
     @if(Auth::user()->rol == 'administrador') 
     <h1>Registro Sanitario</h1>
     @endif
-    @if(Auth::user()->rol == 'piscicultor')     
+    @if(Auth::user()->rol == 'piscicultor' && $alevinExist == 1) 
     <a href="{{ url('sanitary/create/'.$pond_id) }}" class="btn btn-success" > Definir Registro Sanitario</a>
+    @elseif(Auth::user()->rol == 'piscicultor' && $alevinExist == 0)
+    <h1>Definir Registro Sanitario</h1>
+    <h4>Este estanque no tiene alevines</h4>
     @endif
     <br/>
     <br/>

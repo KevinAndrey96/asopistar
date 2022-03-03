@@ -70,12 +70,16 @@ class PondController extends Controller
         if (Auth::user()->rol == 'piscicultor'){
             $user=User::findOrFail(Auth::user()->id);
             $user->date = Carbon::now()->format('Y-m-d');
+            $user->iceSacrificecount = 0;
+            $user->iceCooledcount = 0;
+            $user->iceTransportcount = 0;
+            $user->foodcount = 0;
             $ponds=Pond::where('id', '=', $id)->get();
             foreach ($ponds as $pond) {
                 $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
                 $pondcode = $pond->pondcode;
                 if ($alevin){
-                    $alevin->exist = '1';
+                    $pond->alevinExist = '1';
                     $fechaAntigua  = $alevin->date_of_entry;
                     $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
                     $fechaNueva  =  Carbon::now();
@@ -98,6 +102,17 @@ class PondController extends Controller
                     if ($cantidadDias >= $baitStart){
                         $pond->stage = 'Cebo';
                     }
+                    $foods = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    foreach($foods as $food){
+                        $user->foodcount = $user->foodcount + $food->amount;
+                    }
+                    $ices = Ice::where('pond_id', '=' , $pond->id)->get();
+                    foreach($ices as $ice){
+                        $user->iceSacrificecount = $user->iceSacrificecount + $ice->sacrifice_amount;
+                        $user->iceCooledcount = $user->iceCooledcount + $ice->cooled_amount;
+                        $user->iceTransportcount = $user->iceTransportcount + $ice->transport_amount;
+                    }
+                    
                     $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
                     $ices = Ice::where('pond_id', '=' , $pond->id)->get();
                     $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
@@ -106,9 +121,15 @@ class PondController extends Controller
 
                 }
                 else {
-                    $alevin->exist = '0';
+                    $pond->alevinExist = '0';
                     $pond->age = 'N/A';
                     $pond->stage = 'N/A';
+
+                    $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    $ices = Ice::where('pond_id', '=' , $pond->id)->get();
+                    $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
+                    $weights = Weight::where('pond_id', '=' , $pond->id)->get();
+                    $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get();
                 }
             }
             $user->title = 'Reporte: Estanque_'.$pondcode.' '.$user->name.' '.$user->lastname.' '.$user->date;
@@ -278,12 +299,13 @@ class PondController extends Controller
         if (Auth::user()->rol == 'piscicultor'){
             $user=User::findOrFail(Auth::user()->id);
             $user->date = Carbon::now()->format('Y-m-d');
+            $user->foodcount = 0;
             $ponds=Pond::where('id', '=', $id)->get();
             foreach ($ponds as $pond) {
                 $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
                 $pondcode = $pond->pondcode;
                 if ($alevin){
-                    $alevin->exist = '1';
+                    $pond->alevinExist = '1';
                     $fechaAntigua  = $alevin->date_of_entry;
                     $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
                     $fechaNueva  =  Carbon::now();
@@ -306,6 +328,12 @@ class PondController extends Controller
                     if ($cantidadDias >= $baitStart){
                         $pond->stage = 'Cebo';
                     }
+
+                    $foods = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    foreach($foods as $food){
+                        $user->foodcount = $user->foodcount + $food->amount;
+                    }
+
                     $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
                     $ices = Ice::where('pond_id', '=' , $pond->id)->get();
                     $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
@@ -314,11 +342,22 @@ class PondController extends Controller
 
                 }
                 else {
-                    $alevin->exist = '0';
+                    $pond->alevinExist = '0';
                     $pond->age = 'N/A';
                     $pond->stage = 'N/A';
+
+                    $feedings = Feeding::where('pond_id', '=' , $pond->id)->get();
+                    $ices = Ice::where('pond_id', '=' , $pond->id)->get();
+                    $harvests = Harvest::where('pond_id', '=' , $pond->id)->get();
+                    $weights = Weight::where('pond_id', '=' , $pond->id)->get();
+                    $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get();
                 }
             }
+            $pond=Pond::findOrFail($id);
+            $newPond = $pond->replicate();
+            $newPond->created_at = Carbon::now();
+            $newPond->save();
+
             $user->title = 'Reporte: Estanque_'.$pondcode.' '.$user->name.' '.$user->lastname.' '.$user->date;
             $dataPond['is_enabled'] = 0;
             Pond::where('id', '=', $id)->update( $dataPond);

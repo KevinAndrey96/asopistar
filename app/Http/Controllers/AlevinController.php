@@ -32,8 +32,9 @@ class AlevinController extends Controller
     {
         //
         if (Auth::user()->rol == 'piscicultor'){
-            $alevin = Alevin::where('pond_id','=', $pond_id)->get();
+            $alevin = Alevin::where('pond_id','=', $pond_id)->first();
             if(!$alevin){
+                //dd($alevin);
                 $species = Specie::all();
                 $providers = Provider::all();
                 return view('alevin.create', compact('species', 'providers', 'pond_id'));
@@ -90,20 +91,23 @@ class AlevinController extends Controller
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $alevins = Alevin::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;      
-            if($alevins){
-                $alevinexist=1;
-            }else{
-                $alevinexist=0;
-            }
+            //dd($alevins);
+            $pond_id=$id; 
+            $alevinexist=0;     
             foreach($alevins as $alevin){
-                $fechaAntigua  = $alevin->date_of_entry;
-                $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
-                $fechaNueva  =  Carbon::now();
-                $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
-                $age = $cantidadDias;
-                $alevin->age = $age;
+                if($alevin){
+                    $alevinexist=1;
+                
+                    $fechaAntigua  = $alevin->date_of_entry;
+                    $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
+                    $fechaNueva  =  Carbon::now();
+                    $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
+                    $age = $cantidadDias;
+                    $alevin->age = $age;
+            
+                }
             }
+            
             return view('alevin.index', compact('alevins', 'pond_id', 'alevinexist'));
         }    
     }

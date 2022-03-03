@@ -2,33 +2,35 @@
 <html lang="en"> 
 <head>
     <title>Asopistar</title>
-    
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta name="description" content="Portal - Bootstrap 5 Admin Dashboard Template For Developers">
-    <meta name="author" content="Xiaoying Riley at 3rd Wave Media">    
+    <meta name="description" content="Asopistar portal">
+    <meta name="author" content="Instance Shape SAS">    
     <link rel="shortcut icon" href="/favicon.ico"> 
     
 	<!-- CSRF Token -->
 	<meta name="csrf-token" content="{{ csrf_token() }}">	
 
     <!-- FontAwesome JS-->
-    <script defer src="/assets/plugins/fontawesome/js/all.min.js"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="/assets/plugins/fontawesome/js/all.min.js"></script>
+    
+    <!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 
     <!-- App CSS -->  
     <link id="theme-style" rel="stylesheet" href="/assets/css/portal.css">
-	<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
-	
-	<!--CDN-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Datatables -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/css/jquery.dataTables.css" integrity="sha512-VD0lRk0uECWUYLlTGkAEfQB2n2k6x7CFjVCrbsSmvnWHePsIKIIPiYjLVfrpIlOX8zZO7W5CniSeV2QAhLs2ew==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/js/jquery.dataTables.min.js" integrity="sha512-MGh1jdZrLGRJDDTDTvYo0qx545PaCcViyFmz2YOTUomNWonAq+Jqc/yiutW7S3JijGL5JUXTVKSDU8smc2SkjA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json"></script>
+	
+	<!-- CkEditor -->
 	<script src="//cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
-
-</head> 
+</head>
 
 <body class="app">   	
     <header class="app-header fixed-top">	   	            

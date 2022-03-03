@@ -93,8 +93,13 @@ class WeightController extends Controller
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $weights = Weight::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;         
-            return view('weight.index', compact('weights', 'id', 'pond_id'));
+            $pond_id=$id;
+            $alevin = Alevin::where('pond_id','=', $id)->first();   
+            $alevinExist = 0;
+            if($alevin){
+                $alevinExist = 1;
+            }      
+            return view('weight.index', compact('weights', 'id', 'pond_id', 'alevinExist'));
         } 
     }
 

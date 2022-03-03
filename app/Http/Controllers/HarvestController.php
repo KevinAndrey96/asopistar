@@ -66,7 +66,7 @@ class HarvestController extends Controller
         $dataHarvest = request()->except('_token');
         $dataHarvest['user_id'] = Auth::user()->id; //add request
         $dataHarvest['fish_number'] = Alevin::where('pond_id', '=', $dataHarvest['pond_id'])->firstOrFail()->amount;
-        $dataHarvest['average_weight'] = round($dataHarvest['amount']*1000000/$dataHarvest['fish_number'], 2); 
+        $dataHarvest['average_weight'] = round($dataHarvest['amount']*1000/$dataHarvest['fish_number'], 2); 
         $dataHarvest['species'] = Alevin::where('pond_id', '=', $dataHarvest['pond_id'])->firstOrFail()->species; 
         //dd($dataHarvest);
         //$dataPiscicultor=request->all();
@@ -93,8 +93,13 @@ class HarvestController extends Controller
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $harvests = Harvest::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;         
-            return view('harvest.index', compact('harvests', 'pond_id'));
+            $pond_id=$id;    
+            $alevin = Alevin::where('pond_id','=', $id)->first();
+            $alevinExist = 0;
+            if($alevin){
+                $alevinExist = 1;
+            }     
+            return view('harvest.index', compact('harvests', 'pond_id', 'alevinExist'));
         } 
     }
 
@@ -143,7 +148,7 @@ class HarvestController extends Controller
         $dataHarvest['pond_id'] = Harvest::findOrFail($id)->pond_id;
 
         $dataHarvest['fish_number'] = Alevin::where('pond_id', '=', $dataHarvest['pond_id'])->firstOrFail()->amount;
-        $dataHarvest['average_weight'] = round($dataHarvest['amount']*1000000/$dataHarvest['fish_number'], 2); 
+        $dataHarvest['average_weight'] = round($dataHarvest['amount']*1000/$dataHarvest['fish_number'], 2); 
         $dataHarvest['species'] = Alevin::where('pond_id', '=', $dataHarvest['pond_id'])->firstOrFail()->species; 
         //$dataHarvest['user_id'] = Auth::user()->id; //add request
         

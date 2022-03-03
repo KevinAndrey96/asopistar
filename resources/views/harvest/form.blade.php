@@ -19,14 +19,14 @@
 @endif
 
 <div class="form-group">
-    <label for="amount"> Cantidad Ton</label>
-    <input type="number" class="form-control" name="amount" value="{{ isset($harvest->amount)?$harvest->amount:old('amount') }}" id="amount" step="0.01" min = "1.0" placeholder="Cantidad">
+    <label for="amount"> Cantidad Kg</label>
+    <input type="number" class="form-control" name="amount" value="{{ isset($harvest->amount)?$harvest->amount:old('amount') }}" id="amount" step="0.01" min = "1.0" placeholder="Cantidad kg">
 </div>
 
 <div>
     <label for="destination"> Destino</label>
     <select id="destination" name="destination" class="form-select" aria-label="Default select example">
-            <option value="Planta Asopistar Tibu" > Planta Asopistar Tibu </option>
+            <option value="Planta Asopistar Tibu" > Planta Asopistar Tarra </option>
     </select>
 </div>
 

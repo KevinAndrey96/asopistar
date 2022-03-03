@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sanitary;
 use App\Models\User;
 use App\Models\Pond;
+use App\Models\Alevin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -81,8 +82,13 @@ class SanitaryController extends Controller
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $sanitaries = Sanitary::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;         
-            return view('sanitary.index', compact('sanitaries', 'pond_id'));
+            $pond_id=$id;  
+            $alevin = Alevin::where('pond_id','=', $id)->first();   
+            $alevinExist = 0;
+            if($alevin){
+                $alevinExist = 1;
+            }       
+            return view('sanitary.index', compact('sanitaries', 'pond_id', 'alevinExist'));
         } 
     }
 
