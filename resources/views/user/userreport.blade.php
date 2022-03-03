@@ -17,9 +17,9 @@
                 <th>Genero</th>
                 <th>Estanques</th>
                 <th>Comida Semana Actual</th>
-                <th>Estanques cria</th>
-                <th>Estanques levante</th>
-                <th>Estanques cebo</th>
+                <th>Estanques </th>
+                <th># Peces</th>
+                <th>Especies</th>
                 <th>Estanques Cosecha</th>
                 <th>Cosecha Aproximada</th>
                 <th>Reportes sanitarios</th>
@@ -38,9 +38,23 @@
                     {{ 'Inactivos '.$user->inactiveponds }}
                 </td>
                 <td>{{ $user->foodcount }} kg</td>
-                <td>{{ $user->youngcount }}</td>
-                <td>{{ $user->levantecount }}</td>
-                <td>{{ $user->baitcount }}</td>
+                <td>
+                    Cria: {{ $user->youngcount }}
+                    </br>
+                    levante: {{ $user->levantecount }}
+                    </br>
+                    Cebo: {{ $user->baitcount }}
+                </td>
+                <td>{{ $user->fishcount }}</td>
+                <td>
+                    @if($user->speciecount == 0)
+                        N/A
+                    @else
+                        @foreach($user->userSpecies as $specie)
+                            {{$specie}}.
+                        @endforeach
+                    @endif
+                </td>
                 <td>{{ $user->harvestcount }}</td>
                 <td>
                     1 Mes {{ $user->week4weight }} Kg
@@ -64,9 +78,23 @@
                         {{ 'Inactivos '.$user->inactiveponds }}
                     </td>
                     <td>{{ $user->foodcount }} kg</td>
-                    <td>{{ $user->youngcount }}</td>
-                    <td>{{ $user->levantecount }}</td>
-                    <td>{{ $user->baitcount }}</td>
+                    <td>
+                    Cria: {{ $user->youngcount }}
+                    </br>
+                    levante: {{ $user->levantecount }}
+                    </br>
+                    Cebo: {{ $user->baitcount }}
+                    </td>
+                    <td>{{ $user->fishcount }}</td>
+                    <td>
+                        @if($user->speciecount == 0)
+                            N/A
+                        @else
+                            @foreach($user->userSpecies as $specie)
+                                {{$specie}}.
+                            @endforeach
+                        @endif
+                    </td>
                     <td>{{ $user->harvestcount }}</td>
                     <td>
                         1 Mes {{ $user->week4weight }} Kg
@@ -94,10 +122,21 @@
                     </br>
                     {{ 'Inactivos '.$total['inactiveponds']}}
                 </td>
+                
                 <td>{{ $total['foodcount']}} kg</td>
-                <td>{{ $total['youngcount']}}</td>
-                <td>{{ $total['levantecount']}}</td>
-                <td>{{ $total['baitcount']}}</td>
+                <td>
+                Cria: {{ $total['youngcount']}}
+                </br>
+                levante: {{ $total['levantecount']}}
+                </br>
+                Cebo: {{ $total['baitcount']}}
+                </td>
+                <td>{{ $total['fishcount'] }}</td>
+                <td>
+                    @foreach($total['species'] as $specie)
+                        {{$specie}}.
+                    @endforeach
+                </td>
                 <td>{{ $total['harvestcount'] }}</td>
                 <td>
                     1 Mes {{ $total['week4weight'] }} Kg

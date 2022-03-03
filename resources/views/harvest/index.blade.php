@@ -13,8 +13,11 @@
     @if(Auth::user()->rol == 'administrador') 
     <h1>Cosecha</h1>
     @endif
-    @if(Auth::user()->rol == 'piscicultor')     
+    @if(Auth::user()->rol == 'piscicultor' && $alevinExist == 1) 
     <a href="{{ url('harvest/create/'.$pond_id) }}" class="btn btn-success" > Registro de cosecha</a>
+    @elseif(Auth::user()->rol == 'piscicultor' && $alevinExist == 0)
+    <h1>Registro de cosecha</h1>
+    <h4>Este estanque no tiene alevines</h4>
     @endif
     <br/>
     <br/>
@@ -47,7 +50,7 @@
                     {{ $harvest->pond->pondcode }}
                 </td>
                 <td>{{ $harvest->species }}</td>
-                <td>{{ $harvest->amount }} Ton</td>
+                <td>{{ $harvest->amount }} Kg</td>
                 <td>{{ $harvest->fish_number }}</td>
                 <td>{{ $harvest->average_weight }} gr</td>
                 <td>{{ $harvest->destination }}</td>

@@ -117,8 +117,13 @@ class FeedingController extends Controller
         }  
         if (Auth::user()->rol == 'piscicultor'){
             $feedings = Feeding::where('pond_id', '=', $id)->get();     
-            $pond_id=$id;         
-            return view('feeding.index', compact('feedings', 'pond_id'));
+            $pond_id=$id;  
+            $alevin = Alevin::where('pond_id','=', $pond_id)->first();
+            $alevinExist = 0;
+            if($alevin){
+                $alevinExist = 1;
+            }       
+            return view('feeding.index', compact('feedings', 'pond_id', 'alevinExist'));
         } 
     }
 

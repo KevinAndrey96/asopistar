@@ -12,6 +12,7 @@ use App\Models\Specie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Arr;
 use Carbon\Carbon;
 use PDF;
 
@@ -37,6 +38,7 @@ class PiscicultorController extends Controller
         if (Auth::user()->rol == 'administrador'){
             $isusers = 1;
             $users=User::where('rol', '=', 'piscicultor')->get();
+            $species = Specie::all();
             $total=[];
             $total['femalecount'] = 0;
             $total['malecount'] = 0;
@@ -51,6 +53,13 @@ class PiscicultorController extends Controller
             $total['week4weight'] = 0;
             $total['week12weight'] = 0;
             $total['week24weight'] = 0;
+            $total['fishcount'] = 0;
+            $total['speciecount'] = 0;
+            $total['species'] = [];
+            foreach($species as $specie){
+                $total['speciecount'] = $total['speciecount'] +1;
+                $total['species'] = Arr::prepend($total['species'], $specie->species);
+            }
             foreach($users as $user){
                 if($user->gender == 'femenino'){
                     $total['femalecount'] = $total['femalecount'] + 1;
@@ -70,9 +79,26 @@ class PiscicultorController extends Controller
                 $user->week4weight = 0;
                 $user->week12weight = 0;
                 $user->week24weight = 0;
+                $user->fishcount = 0;
+                $user->speciecount = 0;
+                $userSpecies = [];               
                 foreach ($ponds as $pond) {
                     $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
                     if ($alevin){
+                        if(count($userSpecies) > 0){
+                            for ($i=0; $i < count($userSpecies) ; $i++) { 
+                                if($userSpecies[$i]!=$alevin->species){
+                                    $userSpecies[] = $alevin->species;
+                                    $user->speciecount = $user->speciecount + 1;
+                                }
+                            }
+                        }else{
+                            $userSpecies[] = $alevin->species;
+                            $user->speciecount = $user->speciecount + 1;
+                        }  
+
+                        $user->fishcount = $user->fishcount + $alevin->amount;
+                        $total['fishcount'] = $total['fishcount'] + $alevin->amount;
                         $user->activeponds = $user->activeponds + 1;
                         $total['activeponds'] = $total['activeponds'] + 1;
                         
@@ -120,14 +146,14 @@ class PiscicultorController extends Controller
                             $total['harvestcount'] = $total['harvestcount'] +1;
                         }
                         if ($cantidadDias + 4 >= 24){
-                            $user->week4weight = $alevin->amount * 3;
-                            $total['week4weight'] = $alevin->amount * 3;
+                            $user->week4weight = $user->week4weight + $alevin->amount * 0.5;
+                            $total['week4weight'] = $total['week4weight'] + $alevin->amount * 0.5;
                         }elseif ($cantidadDias + 12 >= 24){
-                            $user->week12weight = $alevin->amount * 3;
-                            $total['week12weight'] = $alevin->amount * 3;
+                            $user->week12weight = $user->week12weight + $alevin->amount * 0.5;
+                            $total['week12weight'] = $total['week12weight'] + $alevin->amount * 0.5;
                         }elseif ($cantidadDias + 24 >= 24){
-                            $user->week24weight = $alevin->amount * 3;
-                            $total['week24weight'] = $alevin->amount * 3;
+                            $user->week24weight = $user->week24weight + $alevin->amount * 0.5;
+                            $total['week24weight'] = $total['week24weight'] + $alevin->amount * 0.5;
                         }
                         
     
@@ -140,14 +166,14 @@ class PiscicultorController extends Controller
                             $pond->sanitary = 'No';
                         }
     
-                    }
-                    else {
+                    }else {
                         $user->inactiveponds = $user->inactiveponds + 1;
                         $total['inactiveponds'] = $total['inactiveponds'] + 1;
                         $pond->stage = 'N/A';
                     }
+                    
                 }
-    
+                $user->userSpecies = $userSpecies;
             }
             //$pdf = PDF::loadView('user.userreport', ['users'=>$users, 'ponds'=>$ponds]);
             //return $pdf->stream();
@@ -174,9 +200,24 @@ class PiscicultorController extends Controller
             $user->week12weight = 0;
             $user->week24weight = 0;
             $user->harvestcount = 0;
+            $user->fishcount = 0;
+            $user->speciecount = 0;
+            $userSpecies = [];  
             foreach ($ponds as $pond) {
                 $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
                 if ($alevin){
+                    if(count($userSpecies) > 0){
+                        for ($i=0; $i < count($userSpecies) ; $i++) { 
+                            if($userSpecies[$i]!=$alevin->species){
+                                $userSpecies[] = $alevin->species;
+                                $user->speciecount = $user->speciecount + 1;
+                            }
+                        }
+                    }else{
+                        $userSpecies[] = $alevin->species;
+                        $user->speciecount = $user->speciecount + 1;
+                    } 
+                    $user->fishcount = $user->fishcount + $alevin->amount;
                     $user->activeponds = $user->activeponds + 1;
                     $fechaAntigua  = $alevin->date_of_entry;
                     $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
@@ -216,14 +257,13 @@ class PiscicultorController extends Controller
                     }
                     if ($cantidadDias >= 24){
                         $user->harvestcount = $user->harvestcount + 1;
-                        $user->week24weight = $alevin->amount * 3;
                     }
                     if ($cantidadDias + 4 >= 24){
-                        $user->week4weight = $alevin->amount * 3;
+                        $user->week4weight = $user->week4weight + $alevin->amount * 0.5;
                     }elseif ($cantidadDias + 12 >= 24){
-                        $user->week12weight = $alevin->amount * 3;
+                        $user->week12weight = $user->week12weight + $alevin->amount * 0.5;
                     }elseif ($cantidadDias + 24 >= 24){
-                        $user->week24weight = $alevin->amount * 3;
+                        $user->week24weight = $user->week24weight + $alevin->amount * 0.5;
                     }
 
                     $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get();
@@ -240,7 +280,7 @@ class PiscicultorController extends Controller
                     $pond->stage = 'N/A';
                 }
             }   
-            //dd($user->id);
+            $user->userSpecies = $userSpecies;
             return view('user.userreport', compact('user', 'ponds', 'isusers', 'id'));
         }
     }
@@ -288,13 +328,13 @@ class PiscicultorController extends Controller
             'lastname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',//|confirmed',
+            'rol' =>'required|string|max:255',
             'unit_number'=>'required',
             'code' =>'required|string|max:255',
             'gender' =>'required|string|max:255',
             'estate' =>'required|string|max:255',//predio
             'sidewalk' =>'required|string|max:255',//vereda
             'phone'=>'required|Numeric|digits:10',
-            'rol' =>'required|string|max:255',
             //'is_enabled' =>'required|boolean',
         ];
         $mensaje=[
@@ -303,11 +343,13 @@ class PiscicultorController extends Controller
         ];
         if(request()->rol == 'administrador'){
             $campos['unit_number'] = '';
+            $campos['estate'] = '';
+            $campos['sidewalk'] = '';
         }
         $this->validate($request, $campos, $mensaje);
 
         //$datosPiscicultor=request->all();
-        $dataUser= request()->except('_token');
+        $dataUser= request()->except('_token', 'updatepass');//revision final
         if($dataUser['rol'] == 'administrador'){
             $dataUser['unit_number'] = 'N/A';
             $dataUser['estate'] = 'N/A';
@@ -432,7 +474,7 @@ class PiscicultorController extends Controller
                     return redirect('user')->with('mensaje', 'Contraseña modificada');
                 } 
                 if (Auth::user()->rol == 'piscicultor'){
-                    return redirect('home')->with('mensaje', 'Contraseñao modificada');
+                    return redirect('home')->with('mensaje', 'Contraseña modificada');
                 }
             } 
         }

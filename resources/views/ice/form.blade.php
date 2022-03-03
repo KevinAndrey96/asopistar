@@ -19,7 +19,7 @@
 @endif
 
 <div class="form-group">
-    <label for="fishing_amount"> Pesca Ton</label>
+    <label for="fishing_amount"> Pesca Kg</label>
     <input type="number" class="form-control" name="fishing_amount" value="{{ isset($ice->fishing_amount)?$ice->fishing_amount:old('fishing_amount') }}" id="fishing_amount" step="0.01" min = "1.0" placeholder="Cantidad">
 </div>
 

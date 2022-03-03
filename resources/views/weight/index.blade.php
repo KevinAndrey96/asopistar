@@ -13,8 +13,11 @@
     @if(Auth::user()->rol == 'administrador') 
     <h1>Pesajes</h1>
     @endif
-    @if(Auth::user()->rol == 'piscicultor')     
+    @if(Auth::user()->rol == 'piscicultor' && $alevinExist == 1) 
     <a href="{{ url('weight/create/'.$pond_id) }}" class="btn btn-success" > Registrar Pesaje</a>
+    @elseif(Auth::user()->rol == 'piscicultor' && $alevinExist == 0)
+    <h1>Registrar Pesaje</h1>
+    <h4>Este estanque no tiene alevines</h4>
     @endif
     <br/>
     <br/>

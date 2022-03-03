@@ -87,8 +87,13 @@ class IceController extends Controller
         } 
         if (Auth::user()->rol == 'piscicultor'){
             $ices = Ice::where('pond_id', '=', $id)->get();   
-            $pond_id=$id;         
-            return view('ice.index', compact('ices', 'pond_id'));
+            $pond_id=$id;
+            $alevin = Alevin::where('pond_id','=', $id)->first();
+            $alevinExist = 0;
+            if($alevin){
+                $alevinExist = 1;
+            }         
+            return view('ice.index', compact('ices', 'pond_id', 'alevinExist'));
         } 
     }
 
