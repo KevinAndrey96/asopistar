@@ -25,7 +25,9 @@
             <tr>
                 <th>Piscicultor</th>
                 <th>Ingreso</th>
+                @if(Auth::user()->rol == 'piscicultor') 
                 <th>Edad</th>
+                @endif
                 <th>Estanque</th>
                 <th># de Peces</th>
                 <th>Especie</th>
@@ -44,7 +46,9 @@
                     {{ $alevin->user->name.' '.$alevin->user->lastname }}
                 </td>
                 <td>{{ $alevin->date_of_entry }}</td>
+                @if(Auth::user()->rol == 'piscicultor') 
                 <td>{{ $alevin->age }} semanas</td>
+                @endif
                 <!--<td>{{ $alevin->pond_id }}</td>-->
                 <td>{{ $alevin->pond->pondcode }}</td>
                 <td>{{ $alevin->amount }}</td>

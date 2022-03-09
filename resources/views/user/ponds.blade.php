@@ -12,7 +12,7 @@
                 <tr>
                     <th>Piscicultor</th>
                     <th># de Estanque</th>
-                    <th>Volumen de Estanque</th>
+                    <th>Espejo de agua</th>
                     <th>Aforo de agua</th>
                     <th>Equipos</th>
                     <th>Edad</th>
@@ -30,8 +30,8 @@
                         {{ $pond->user->name.' '.$pond->user->lastname }}
                     </td>
                     <td>{{ $pond->pondcode }}</td>
-                    <td>{{ $pond->pond_area }} m<sup>3</sup></td>
-                    <td>{{ $pond->water }} lt/min</td>
+                    <td>{{ $pond->pond_area }} m<sup>2</sup></td>
+                    <td>{{ $pond->water }} lt/seg</td>
                     <td>{{ $pond->tools }}</td>
                     <td>{{ $pond->age }} semanas</td>
                     <td>{{ $pond->stage }}</td>

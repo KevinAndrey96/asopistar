@@ -18,12 +18,12 @@
 </div>
 
 <div class="form-group">
-    <label for="pond_area"> Volumen del estanque m<sup>3</sup></label>
+    <label for="pond_area"> Espejo de agua m<sup>2</sup></label>
     <input type="number" class="form-control" name="pond_area" value="{{ isset($pond->pond_area)?$pond->pond_area:old('pond_area') }}" id="pond_area" step="0.01" min = "1.0" placeholder="Área">
 </div>
 
 <div class="form-group">
-    <label for="water"> Aforo de agua Lt/min</label>
+    <label for="water"> Aforo de agua Lt/seg</label>
     <input type="number" class="form-control" name="water" value="{{ isset($pond->water)?$pond->water:old('water') }}" id="water" step="0.01" min = "1.0" placeholder="Aforo">
 </div>
 

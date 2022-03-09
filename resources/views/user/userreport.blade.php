@@ -6,7 +6,7 @@
     @if($isusers == 0)
         <h1> Reporte </h1>
     @else
-        <h1> Reporte Global</h1>
+        <h1> Reporte Global de unidades piscicolas</h1>
     @endif
     
     <br/>

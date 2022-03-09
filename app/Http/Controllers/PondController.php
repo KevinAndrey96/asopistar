@@ -39,20 +39,24 @@ class PondController extends Controller
                     $pond->age = $cantidadDias;
 
                     $specie = $alevin->species;
-                    $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
-
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
+                    if(Specie::where('species', '=', $specie)->first()){
+                        $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
+                        $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                        $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                        $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                        if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                            $pond->stage = 'Cria';
+                        }
+                        if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                            $pond->stage = 'Levante';
+                        }
+                        if ($cantidadDias >= $baitStart){
+                            $pond->stage = 'Cebo';
+                        }
+                    }else{
+                        $pond->stage = $specie.' fue borrada';
                     }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
-                    }
+                                        
                 }
                 else {
                     $pond->age = 'N/A';
@@ -87,21 +91,26 @@ class PondController extends Controller
                     $pond->age = $cantidadDias;
                     
                     $specie = $alevin->species;
-                    $especies = Specie::where('species', '=', $specie)->first();
-                    $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                    if(Specie::where('species', '=', $specie)->first()){
+                        $especies = Specie::where('species', '=', $specie)->first();
+                        $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
+                        $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                        $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                        $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
 
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
+                        if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                            $pond->stage = 'Cria';
+                        }
+                        if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                            $pond->stage = 'Levante';
+                        }
+                        if ($cantidadDias >= $baitStart){
+                            $pond->stage = 'Cebo';
+                        }
+                    }else{
+                        $pond->stage = $specie.' fue borrada';
                     }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
-                    }
+                    
                     $foods = Feeding::where('pond_id', '=' , $pond->id)->get();
                     foreach($foods as $food){
                         $user->foodcount = $user->foodcount + $food->amount;
@@ -193,45 +202,7 @@ class PondController extends Controller
      */
     public function show($id)
     {
-        //
-        if (Auth::user()->rol == 'administrador'){
-            $user=User::findOrFail($id);
-            $ponds=Pond::where('user_id', '=', $id)->get();
-            foreach ($ponds as $pond) {
-                $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
-                if ($alevin){
-                    $fechaAntigua  = $alevin->date_of_entry;
-                    $fechaAntigua = Carbon::createFromFormat('Y-m-d', $fechaAntigua);
-                    $fechaNueva  =  Carbon::now();
-                    $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
-                    $pond->age = $cantidadDias;
-                    
-                    $specie = $alevin->species;
-                    $especies = Specie::where('species', '=', $specie)->first();
-                    $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
-
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
-                    }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
-                    }
-
-                }
-                else {
-                    $pond->age = 'N/A';
-                    $pond->stage = 'N/A';
-                }
-            }
-
-            return view('pond.index', compact('user', 'ponds'));
-        }  
+        // 
     }
 
     /**
@@ -313,20 +284,24 @@ class PondController extends Controller
                     $pond->age = $cantidadDias;
                     
                     $specie = $alevin->species;
-                    $especies = Specie::where('species', '=', $specie)->first();
-                    $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
-
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
-                    }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
+                    if(Specie::where('species', '=', $specie)->first()){
+                        $especies = Specie::where('species', '=', $specie)->first();
+                        $youngEnd = Specie::where('species', '=', $specie)->first()->young_end;
+                        $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                        $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                        $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+    
+                        if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                            $pond->stage = 'Cria';
+                        }
+                        if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                            $pond->stage = 'Levante';
+                        }
+                        if ($cantidadDias >= $baitStart){
+                            $pond->stage = 'Cebo';
+                        }
+                    }else{
+                        $pond->stage = $specie.' fue borrada';
                     }
 
                     $foods = Feeding::where('pond_id', '=' , $pond->id)->get();

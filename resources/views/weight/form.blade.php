@@ -56,6 +56,7 @@
     function calculateFood()
     {
         const foodEstrategy = [];
+        foodEstrategy[0] = 0.14;
         foodEstrategy[1] = 0.14;
         foodEstrategy[2] = 0.25;
         foodEstrategy[3] = 0.47;
@@ -88,6 +89,7 @@
         foodEstrategy[30] = 0.14;
 
         const proteinEstrategy = [];
+        proteinEstrategy[0] = "45% Harina Inmunoaqua";
         proteinEstrategy[1] = "45% Harina Inmunoaqua";
         proteinEstrategy[2] = "45% Harina Inmunoaqua";
         proteinEstrategy[3] = "45% 1.2 mm, 1.3 mm";
