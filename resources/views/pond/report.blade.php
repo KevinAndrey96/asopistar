@@ -30,7 +30,7 @@
 	<thead class="thead-light">
 		<tr>
 			<th># de Estanque</th>
-			<th>Área de Estanque</th>
+			<th>Espejo de agua</th>
 			<th>Aforo de agua</th>
 			<th>Equipos</th>
 			<th>Edad</th>
@@ -43,8 +43,8 @@
 		@foreach( $ponds as $pond )
 		<tr>
 			<td>{{ $pond->pondcode }}</td>
-			<td>{{ $pond->pond_area }} Km2</td>
-			<td>{{ $pond->water }} lt/min</td>
+			<td>{{ $pond->pond_area }}  m<sup>2</sup></td>
+			<td>{{ $pond->water }} lt/seg</td>
 			<td>{{ $pond->tools }}</td>
 			<td>{{ $pond->age }} semanas</td>
 			<td>{{ $pond->stage }}</td>
@@ -161,7 +161,7 @@
 		@foreach( $harvests as $harvest )
 		<tr>
 			<td>{{ $harvest->date_of_entry }}</td>
-			<td>{{ $harvest->amount }} Ton</td>
+			<td>{{ $harvest->amount }} Kg</td>
 			<td>{{ $harvest->fish_number }}</td>
 			<td>{{ $harvest->average_weight }} gr</td>
 			<td>{{ $harvest->destination }}</td>

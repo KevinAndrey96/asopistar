@@ -85,6 +85,7 @@ class PiscicultorController extends Controller
                 foreach ($ponds as $pond) {
                     $alevin = Alevin::where('pond_id', '=' , $pond->id)->first();
                     if ($alevin){
+                        
                         if(count($userSpecies) > 0){
                             for ($i=0; $i < count($userSpecies) ; $i++) { 
                                 if($userSpecies[$i]!=$alevin->species){
@@ -108,11 +109,44 @@ class PiscicultorController extends Controller
                         $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
                         $pond->age = $cantidadDias;                    
                         $specie = $alevin->species;
-                        $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
-                        $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                        $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                        $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
-    
+                        if(Specie::where('species', '=', $specie)->first()){
+                            $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
+                            $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                            $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                            $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                            if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                                $pond->stage = 'Cria';
+                                $user->youngcount = $user->youngcount +1;
+                                $total['youngcount'] = $total['youngcount'] +1;
+                            }
+                            if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                                $pond->stage = 'Levante';
+                                $user->levantecount = $user->levantecount + 1;
+                                $total['levantecount'] = $total['levantecount'] + 1;
+                            }
+                            if ($cantidadDias >= $baitStart){
+                                $pond->stage = 'Cebo';
+                                $user->baitcount = $user->baitcount + 1;
+                                $total['baitcount'] = $total['baitcount'] + 1;
+                            }
+                            if ($cantidadDias >= 24){
+                                $user->harvestcount = $user->harvestcount + 1;
+                                $total['harvestcount'] = $total['harvestcount'] +1;
+                            }
+                            if ($cantidadDias + 4 >= 24){
+                                $user->week4weight = $user->week4weight + $alevin->amount * 0.5;
+                                $total['week4weight'] = $total['week4weight'] + $alevin->amount * 0.5;
+                            }elseif ($cantidadDias + 12 >= 24){
+                                $user->week12weight = $user->week12weight + $alevin->amount * 0.5;
+                                $total['week12weight'] = $total['week12weight'] + $alevin->amount * 0.5;
+                            }elseif ($cantidadDias + 24 >= 24){
+                                $user->week24weight = $user->week24weight + $alevin->amount * 0.5;
+                                $total['week24weight'] = $total['week24weight'] + $alevin->amount * 0.5;
+                            }
+                        }else{
+                            $userSpecies[$user->speciecount-1] = $specie.' fue borrada';
+                        }
+                        
                         $foods = Feeding::where('pond_id', '=' , $pond->id)->get();
                         foreach($foods as $food){
                             $fechaFood = $food->date_of_entry;
@@ -126,37 +160,6 @@ class PiscicultorController extends Controller
                             }
                         }
 
-                        if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                            $pond->stage = 'Cria';
-                            $user->youngcount = $user->youngcount +1;
-                            $total['youngcount'] = $total['youngcount'] +1;
-                        }
-                        if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                            $pond->stage = 'Levante';
-                            $user->levantecount = $user->levantecount + 1;
-                            $total['levantecount'] = $total['levantecount'] + 1;
-                        }
-                        if ($cantidadDias >= $baitStart){
-                            $pond->stage = 'Cebo';
-                            $user->baitcount = $user->baitcount + 1;
-                            $total['baitcount'] = $total['baitcount'] + 1;
-                        }
-                        if ($cantidadDias >= 24){
-                            $user->harvestcount = $user->harvestcount + 1;
-                            $total['harvestcount'] = $total['harvestcount'] +1;
-                        }
-                        if ($cantidadDias + 4 >= 24){
-                            $user->week4weight = $user->week4weight + $alevin->amount * 0.5;
-                            $total['week4weight'] = $total['week4weight'] + $alevin->amount * 0.5;
-                        }elseif ($cantidadDias + 12 >= 24){
-                            $user->week12weight = $user->week12weight + $alevin->amount * 0.5;
-                            $total['week12weight'] = $total['week12weight'] + $alevin->amount * 0.5;
-                        }elseif ($cantidadDias + 24 >= 24){
-                            $user->week24weight = $user->week24weight + $alevin->amount * 0.5;
-                            $total['week24weight'] = $total['week24weight'] + $alevin->amount * 0.5;
-                        }
-                        
-    
                         $sanitaries = Sanitary::where('pond_id', '=' , $pond->id)->get();
                         if(count($sanitaries) > 0){
                             $pond->sanitary = 'Si';
@@ -225,10 +228,27 @@ class PiscicultorController extends Controller
                     $cantidadDias = $fechaAntigua->diffInWeeks($fechaNueva);
                     $pond->age = $cantidadDias;                    
                     $specie = $alevin->species;
-                    $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                    if(Specie::where('species', '=', $specie)->first()){
+                        $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
+                        $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                        $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                        $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                        if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                            $pond->stage = 'Cria';
+                            $user->youngcount = $user->youngcount +1;
+                        }
+                        if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                            $pond->stage = 'Levante';
+                            $user->levantecount = $user->levantecount + 1;
+                        }
+                        if ($cantidadDias >= $baitStart){
+                            $pond->stage = 'Cebo';
+                            $user->baitcount = $user->baitcount + 1;
+                        }
+                    }else{
+                        $userSpecies[$user->speciecount-1] = $specie.' fue borrada';
+                    }
+                    
                     
                     $foods = Feeding::where('pond_id', '=' , $pond->id)->get();
                     foreach($foods as $food){
@@ -243,18 +263,6 @@ class PiscicultorController extends Controller
                         }
                     }
 
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
-                        $user->youngcount = $user->youngcount +1;
-                    }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                        $user->levantecount = $user->levantecount + 1;
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
-                        $user->baitcount = $user->baitcount + 1;
-                    }
                     if ($cantidadDias >= 24){
                         $user->harvestcount = $user->harvestcount + 1;
                     }
@@ -387,20 +395,29 @@ class PiscicultorController extends Controller
                     $pond->age = $cantidadDias;
                     
                     $specie = $alevin->species;
-                    $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
-                    $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
-                    $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
-                    $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                    if($pond->is_enabled == 1){
+                        if(Specie::where('species', '=', $specie)->first()){
+                            $youngEnd = Specie::where('species', '=', $specie)->firstOrFail()->young_end;
+                            $levanteStart = Specie::where('species', '=', $specie)->firstOrFail()->levante_start;
+                            $levanteEnd = Specie::where('species', '=', $specie)->firstOrFail()->levante_end ;
+                            $baitStart = Specie::where('species', '=', $specie)->firstOrFail()->bait_start;
+                            if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
+                                $pond->stage = 'Cria';
+                            }
+                            if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
+                                $pond->stage = 'Levante';
+                            }
+                            if ($cantidadDias >= $baitStart){
+                                $pond->stage = 'Cebo';
+                            }
+                        }else{
+                            $pond->stage = $specie.' fue borrada';
+                        }
 
-                    if ($cantidadDias >= 0 && $cantidadDias <= $youngEnd ){
-                        $pond->stage = 'Cria';
+                    }else{
+                        $pond->stage = 'Finalizado';
                     }
-                    if ($cantidadDias >= $levanteStart && $cantidadDias <= $levanteEnd ){
-                        $pond->stage = 'Levante';
-                    }
-                    if ($cantidadDias >= $baitStart){
-                        $pond->stage = 'Cebo';
-                    }
+                    
 
                 }
                 else {
