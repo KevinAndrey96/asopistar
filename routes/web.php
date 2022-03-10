@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RecipesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PiscicultorController;
 use App\Http\Controllers\AlevinController;
@@ -61,6 +62,8 @@ route::resource('foodbrand', FoodbrandController::class)->middleware('auth');
 route::resource('blog', BlogController::class)->middleware('auth');
 
 route::resource('product', ProductController::class)->middleware('auth');
+
+route::resource('recipes', RecipesController::class)->middleware('auth');
 
 Auth::routes();//['register'=>false,'reset'=>false]
 

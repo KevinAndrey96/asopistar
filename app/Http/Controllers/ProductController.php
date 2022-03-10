@@ -40,12 +40,13 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
-        //
         $campos=[
             'name'=>'required|string',
             'description'=>'required|string',
@@ -62,7 +63,7 @@ class ProductController extends Controller
         $this->validate($request, $campos, $mensaje);
 
         $dataproduct= request()->except(['_token','_method', 'image']);
-        
+
         $product = new Product();
         $product->name = $request->input('name');
         $product->description = $request->input('description');
@@ -119,7 +120,7 @@ class ProductController extends Controller
     {
         //
         $product = Product::findOrFail($id);
-        
+
         return view('product.edit', compact('product'));
     }
 
@@ -177,7 +178,7 @@ class ProductController extends Controller
 
         //buscamos registro con el id que pasamos y actualizamos
         Product::where('id', '=', $id)->update( $dataproduct);
-        
+
         return redirect('product')->with('mensaje', 'Producto modificado');
     }
 
@@ -189,7 +190,6 @@ class ProductController extends Controller
      */
     public function destroy(int $id)
     {
-        //
         $product=Product::findOrFail($id);
         Product::destroy($id);
         return redirect('product')->with('mensaje', 'Producto borrado');
