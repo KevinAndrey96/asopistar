@@ -13,7 +13,6 @@ services:
       APP_NAME: "Asopistar Aquaculture ERP"
       APP_ENV: local
       APP_DEBUG: "true"
-      APP_KEY: "="
       APP_URL: "http://localhost:8094"
       DB_CONNECTION: mysql
       DB_HOST: asopistar-db

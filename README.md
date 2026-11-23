@@ -1,4 +1,4 @@
-# Aquaculture & Fish Farming ERP Platform: Asociación de Piscicultores Management System
+# asopistar-erp-platform: Enterprise Aquaculture & Fish Farming Management System
 
 <div align="center">
 
@@ -113,8 +113,8 @@ The repository provides a turnkey, multi-container Docker Compose stack for inst
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/KevinAndrey96/aquaculture-fish-farming-erp-platform.git
-cd aquaculture-fish-farming-erp-platform
+git clone https://github.com/KevinAndrey96/asopistar-erp-platform.git
+cd asopistar-erp-platform
 
 # 2. Start the containerized environment
 docker compose up -d --build
@@ -160,7 +160,7 @@ The database is pre-seeded with full operational test accounts:
 ## 📂 Repository Structure
 
 ```text
-aquaculture-fish-farming-erp-platform/
+asopistar-erp-platform/
 ├── app/
 │   ├── Http/Controllers/     # Controllers (Piscicultor, Pond, Alevin, Feeding, Harvest, etc.)
 │   └── Models/               # Eloquent Models (Pond, Specie, Alevin, Feeding, Weight, etc.)
