@@ -1,92 +1,110 @@
-# Asopistar: Enterprise Aquaculture & Fish Farming ERP Platform
+# Aquaculture & Fish Farming ERP Platform: Asociación de Piscicultores Management System
 
-[![Laravel](https://img.shields.io/badge/Laravel-8.x-FF2D20?style=flat&logo=laravel)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=flat&logo=php)](https://www.php.net/)
-[![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545?style=flat&logo=mariadb)](https://mariadb.org/)
-[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker)](https://www.docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+<div align="center">
 
-An enterprise-ready **Aquaculture & Fish Farming ERP Management Platform** engineered in **Laravel 8**, **PHP 8.1+**, and **MySQL/MariaDB**. Originally developed for the **Asociación de Piscicultores (Asopistar)**, this platform digitizes and centralizes the operational lifecycle of continental aquaculture farms: fish farmer profiling, pond infrastructure, alevin stocking, daily ration feeding, biometric growth sampling, water quality and health treatments, post-harvest cold chain logistics, and automated PDF certification reports.
+[![Laravel](https://img.shields.io/badge/Laravel-8.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+<p align="center">
+  <strong>Enterprise Aquaculture & Continental Fish Farming Management Platform (ERP). Engineered for fish farmer associations (Asociaciones de Piscicultores) to coordinate rural producers, track pond lifecycles, optimize feed conversion, monitor biometric growth, enforce cold-chain biosecurity, and record harvest yields.</strong>
+</p>
+
+</div>
 
 ---
 
-## 🐟 System Architecture & Core Modules
+## 📌 Executive Summary & Real-World Domain
 
-The platform is designed around dual role-based access control (**Administrator** and **Piscicultor / Producer**), managing the end-to-end aquaculture production cycle:
+In continental aquaculture, associations of small and mid-scale fish farmers (*Asociaciones de Piscicultores*) face significant operational challenges: decentralized record-keeping, unstandardized feeding regimens, disease vulnerability due to unmonitored water chemistry, and post-harvest biomass loss during road transit.
+
+Originally engineered for the **Asociación de Piscicultores (Asopistar)** in Colombia, this platform transitions artisanal fish farming into a digitized, data-driven, and audit-compliant agricultural enterprise. The ERP unifies association governance with day-to-day farm operations across rural plots (*predios* and *veredas*), offering complete biological traceability from certified fingerling stocking (*siembra de alevinos*) through biometric growth sampling to cold-chain preservation and commercial harvest yields (*cosechas*).
+
+---
+
+## 🐟 Production Lifecycle & Architectural Pipeline
+
+The platform enforces strict Role-Based Access Control (**Association Administrator** and **Fish Farmer / Producer**), coordinating every phase of the continental aquaculture supply chain:
 
 ```mermaid
 flowchart TD
     subgraph Governance["1. Association Governance & Master Data"]
-        A["Admin Dashboard"] --> B["Fish Farmers CRM (Predios & Veredas)"]
-        A --> C["Fish Species Taxonomy (Tilapia, Cachama, Trucha)"]
-        A --> D["Feed Brands (Protein %: 28% to 45%)"]
-        A --> E["Certified Seed & Alevin Suppliers"]
+        A["Association Executive Portal"] --> B["Fish Farmer CRM (Rural Cadastre, Predios, Veredas)"]
+        A --> C["Species Taxonomy (Tilapia Roja, Cachama, Trucha, Bocachico)"]
+        A --> D["Feed Brands (Protein Content: 28% to 45%)"]
+        A --> E["Certified Genetics & Alevin Seed Suppliers"]
     end
-    subgraph Operations["2. Farm & Pond Operations"]
-        F["Pond Infrastructure (Earth & Geomembrane)"] --> G["Alevin Stocking & Seeding Records"]
-        G --> H["Daily Feeding Logs (Stage, Rations, Protein)"]
-        H --> I["Biometric Sampling (Weight, Biomass, FCR)"]
-        I --> J["Sanitary Treatments & Water Quality Parameters"]
+    subgraph FarmOps["2. Pond Infrastructure & Production Cycle"]
+        F["Pond Cadastre (Compacted Earth vs HDPE Geomembrane)"] --> G["Fingerling Stocking (Alevin Batch Traceability)"]
+        G --> H["Daily Feeding Regimens (Alevinaje, Levante, Engorde)"]
+        H --> I["Biometric Growth Sampling (Mean Weight, Biomass, FCR)"]
+        I --> J["Water Biosecurity & Prophylaxis Treatments"]
     end
-    subgraph Logistics["3. Post-Harvest & Commercial Distribution"]
-        K["Cold Chain Logistics (Ice & Sacrifice Weight)"] --> L["Harvest Tracking & Yield Assessment"]
-        L --> M["Commercial Distribution Channels"]
+    subgraph Logistics["3. Post-Harvest & Cold-Chain Fulfillment"]
+        K["Ice & Cold Storage Ratios (Thermal Preservation)"] --> L["Harvest Yield Assessment (Net Biomass & Survival Rates)"]
+        L --> M["Commercial Distribution & Off-Takers"]
     end
-    subgraph Intelligence["4. Reporting & Public Portal"]
-        N["Automated DomPDF Dossiers (Per-Pond & Global)"]
-        O["Public Catalog, Gastro Recipes & Educational Blog"]
+    subgraph Intelligence["4. Regulatory Dossiers & Public Presence"]
+        N["Automated DomPDF Audit Dossiers (ICA & AUNAP Compliance)"]
+        O["Public Catalog, Gastronomic Recipes & Educational Blog"]
     end
-    Governance --> Operations --> Logistics --> Intelligence
+    Governance --> FarmOps --> Logistics --> Intelligence
 ```
 
 ---
 
-## 🚀 Key Functional Capabilities
+## 🚀 Key Functional Modules
 
-### 1. Producer CRM & Pond Cadastre
-- **Farmer Identity & Rural Location**: Profiles aquaculture producers with unique association codes, tax IDs, contact channels, and rural plot designations (*predios* and *veredas*).
-- **Pond Infrastructure Modeling**: Manages physical pond dimensions (surface area in $m^2$, water volume in $m^3$), construction type (compacted earth vs high-density polyethylene HDPE geomembranes), aeration equipment (paddle wheels, splash aerators), and lifecycle states.
+### 1. Producer CRM & Rural Pond Cadastre
+- **Farmer Identity & Rural Georeferencing**: Catalogs associated producers with national tax identifiers, association membership codes, contact channels, and rural plot coordinates (*predios* and *veredas*).
+- **Pond Infrastructure Modeling**: Registers physical pond parameters including surface area ($m^2$), water column volume ($m^3$), construction typology (compacted clay/earth vs high-density polyethylene HDPE geomembranes), aeration assets (paddle wheels, splash aerators), and current operational states.
 
-### 2. Alevin Stocking & Seeding
-- **Seed Provenance Traceability**: Logs incoming alevin batches, supplier genetics certification, quantity stocked, and stocking density calculations.
-- **Species Lifecycle Taxonomy**: Configurable developmental thresholds for **Tilapia Roja** (*Oreochromis sp.*), **Cachama Negra** (*Colossoma macropomum*), **Trucha Arcoiris** (*Oncorhynchus mykiss*), and **Bocachico** (*Prochilodus magdalenae*).
+### 2. Fingerling Stocking & Biological Seed Traceability
+- **Genetics Provenance**: Records incoming alevin batches, supplier genetics certification, quantity stocked, and stocking density per cubic meter.
+- **Taxonomic Multi-Species Support**: Built-in biological parameters for:
+  - **Tilapia Roja** (*Oreochromis sp.*)
+  - **Cachama Negra** (*Colossoma macropomum*)
+  - **Trucha Arcoiris** (*Oncorhynchus mykiss*)
+  - **Bocachico** (*Prochilodus magdalenae*)
 
-### 3. Feeding Optimization & Growth Biometry
-- **Nutrition Stages**: Categorizes daily feeding by production phase (*Alevinaje*, *Levante*, *Engorde*) and protein requirements (28% to 45%).
-- **Biometric Weight Sampling**: Records periodic sample counts and total weight to calculate mean individual weight, total pond biomass, and Feed Conversion Ratios (FCR).
+### 3. Nutrition Optimization & Biometric Growth Tracking
+- **Phased Nutrition Programs**: Logs daily feed rations segmented by production stage (*Alevinaje*, *Levante*, *Engorde*) and crude protein concentrations (28%, 32%, 38%, 45%).
+- **Biometric Sampling**: Computes sample counts and gross weights to calculate mean individual fish weight, total pond biomass, average daily weight gain (ADG), and Feed Conversion Ratios (FCR).
 
-### 4. Health Biosecurity & Water Quality
-- **Sanitary Treatments**: Logs preventive and corrective prophylaxis (agricultural lime, sea salt treatments, formalin, probiotics).
-- **Physical-Chemical Logging**: Tracks dissolved oxygen, temperature, pH, and water transparency (Secchi disk readings).
+### 4. Water Biosecurity & Prophylactic Health Records
+- **Sanitary Treatments**: Logs preventive and corrective chemical/organic prophylaxis (agricultural lime, sodium chloride/sea salt baths, formalin, bio-remediation probiotics).
+- **Physical-Chemical Logging**: Tracks dissolved oxygen, temperature, pH, and water transparency readings (Secchi disk depth).
 
-### 5. Post-Harvest Cold Chain & Commercialization
-- **Ice & Cold Storage Ratios**: Monitors post-harvest temperature control, logging ice ratios per kilogram during slaughter, initial chilling, and road transport.
-- **Harvest Execution**: Tracks final harvest yields, piece counts, mean harvest weights, and destinations (wholesale fish markets, restaurants, processing facilities).
+### 5. Post-Harvest Cold Chain & Commercial Harvest Yields
+- **Thermal Preservation Compliance**: Monitors ice-to-fish ratios during humane slaughter, initial chilling, and road dispatch to prevent spoilage and texture degradation.
+- **Harvest Yield Analytics**: Aggregates final harvest metrics: gross harvested biomass (kg), total piece counts, average harvest weight, pond survival percentages, and commercial distribution channels.
 
-### 6. Automated PDF Generation
-- **Executive Dossiers**: Integrates **DomPDF** to compile formal exportable PDF audit dossiers per pond or aggregate association summaries for governmental agricultural authorities.
+### 6. Automated PDF Auditing & Regulatory Compliance
+- **DomPDF Inspection Dossiers**: Generates automated, vectorized PDF inspection certificates per individual pond or consolidated association summaries formatted for agricultural audit agencies (ICA, AUNAP).
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Technology Stack & Engineering Specifications
 
 | Layer | Component | Specification |
 | :--- | :--- | :--- |
-| **Backend Framework** | Laravel 8.x | Clean MVC, Service Providers, Eloquent ORM |
-| **Runtime** | PHP 8.1+ | Alpine Linux container, OPcache enabled |
+| **Backend Framework** | Laravel 8.x | MVC architecture, Eloquent ORM, Service Layer, Seeders |
+| **Runtime** | PHP 8.1+ | Alpine Linux container, OPcache acceleration |
 | **Web Server** | Nginx | Reverse proxy with FastCGI process manager |
-| **Database** | MariaDB 10.11 / MySQL 8.0 | ACID relational engine, foreign key integrity |
-| **PDF Engine** | Barryvdh Laravel DomPDF | Vectorized PDF reporting and dossiers |
-| **Email Testing** | Mailpit | Local SMTP interception and visual mailbox |
+| **Relational Database** | MariaDB 10.11 / MySQL 8.0 | InnoDB ACID transactions, foreign key constraints |
+| **PDF Engine** | Barryvdh Laravel DomPDF | Vectorized PDF reports and regulatory dossiers |
+| **Email Interception** | Mailpit | Local SMTP testbed and debugging interface |
 | **Containerization** | Docker & Docker Compose | Multi-container automated orchestration |
 
 ---
 
 ## 📦 Containerized Quickstart (Docker Compose)
 
-The repository provides a turnkey, multi-container Docker Compose stack configured for instant local evaluation.
+The repository provides a turnkey, multi-container Docker Compose stack for instant local evaluation.
 
-### Prerrequisitos
+### Prerequisites
 
 - **Docker Desktop** (version 20.10+ / Compose v2).
 - Ports `8094`, `8095`, `3312`, and `8026` available locally.
@@ -95,18 +113,18 @@ The repository provides a turnkey, multi-container Docker Compose stack configur
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/KevinAndrey96/asopistar.git
-cd asopistar
+git clone https://github.com/KevinAndrey96/aquaculture-fish-farming-erp-platform.git
+cd aquaculture-fish-farming-erp-platform
 
 # 2. Start the containerized environment
 docker compose up -d --build
 ```
 
-The startup script will automatically:
-1. Initialize the **MariaDB 10.11** database container and wait for the health check.
+The automated startup script will:
+1. Initialize the **MariaDB 10.11** database container with health verification.
 2. Build the **PHP 8.1 FPM + Nginx** application image.
-3. Execute database schema migrations (`php artisan migrate --force`).
-4. Seed the database with realistic aquaculture production records (`php artisan db:seed --force`).
+3. Execute all database migrations (`php artisan migrate --force`).
+4. Seed the database with a complete aquaculture operational dataset (`php artisan db:seed --force`).
 
 ---
 
@@ -114,35 +132,35 @@ The startup script will automatically:
 
 | Service | Access URL | Port | Description |
 | :--- | :--- | :---: | :--- |
-| **Asopistar Web App** | [http://localhost:8094](http://localhost:8094) | `8094` | Main application and producer dashboard |
+| **Aquaculture ERP Web App** | [http://localhost:8094](http://localhost:8094) | `8094` | Main application and producer dashboard |
 | **phpMyAdmin** | [http://localhost:8095](http://localhost:8095) | `8095` | Visual database manager (User: `root`, Pass: `***REMOVED***`) |
 | **Mailpit Web UI** | [http://localhost:8026](http://localhost:8026) | `8026` | Local transactional email interceptor |
-| **MariaDB Server** | `localhost:3312` | `3312` | Direct MySQL/MariaDB database connection |
+| **MariaDB Server** | `localhost:3312` | `3312` | Direct relational database connection |
 
 ---
 
 ## 🔑 Pre-Seeded Demo Credentials
 
-The database is pre-seeded with complete demo accounts and operational records:
+The database is pre-seeded with full operational test accounts:
 
 ### 1. Association Administrator
 - **URL**: [http://localhost:8094/login](http://localhost:8094/login)
 - **Email**: `admin@asopistar.com`
 - **Password**: `***REMOVED***`
-- **Scope**: Full access to association dashboard, global reports, producer catalog, species taxonomy, suppliers, feed brands, blogs, and recipes.
+- **Permissions**: Global association overview, producer catalog, species taxonomy, suppliers, feed brands, educational blogs, and recipes.
 
 ### 2. Piscicultor / Fish Farmer
 - **URL**: [http://localhost:8094/login](http://localhost:8094/login)
 - **Email**: `piscicultor@asopistar.com`
 - **Password**: `***REMOVED***`
-- **Scope**: Producer dashboard for Hacienda La Esperanza: ponds EST-01 and EST-02, alevin stocking, daily feeding logs, biomass growth weights, health logs, ice cold-chain records, and pond PDF downloads.
+- **Permissions**: Producer dashboard for Hacienda La Esperanza (Ponds EST-01 and EST-02), stocking records, daily feeding logs, biometric weight sampling, sanitary treatments, cold chain records, and PDF dossier downloads.
 
 ---
 
 ## 📂 Repository Structure
 
 ```text
-asopistar/
+aquaculture-fish-farming-erp-platform/
 ├── app/
 │   ├── Http/Controllers/     # Controllers (Piscicultor, Pond, Alevin, Feeding, Harvest, etc.)
 │   └── Models/               # Eloquent Models (Pond, Specie, Alevin, Feeding, Weight, etc.)
@@ -166,3 +184,13 @@ asopistar/
 ## 📄 License
 
 This software is open-sourced under the [MIT License](LICENSE).
+
+---
+
+## 👨‍💻 Author
+
+**Kevin Andrey Herrera Silva**  
+*Senior Backend Engineer & Software Architect*  
+Bogotá, Colombia  
+- [GitHub](https://github.com/KevinAndrey96)  
+- [LinkedIn](https://www.linkedin.com/in/kevinandrey96/)  
