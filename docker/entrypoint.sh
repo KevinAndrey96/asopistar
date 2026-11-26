@@ -1,35 +1,18 @@
 #!/bin/sh
-set -e
+# Prepares the container on every start: migrations, catalogs and caches.
+# Set SEED_DEMO=true to load the demo association.
+set -eu
 
-cd /var/www/html
-
-if [ ! -f .env ]; then
-    cp .env.example .env
+if [ -z "${APP_KEY:-}" ]; then
+    echo "APP_KEY is required; generate one with: make env" >&2
+    exit 1
 fi
 
-if ! grep -q "^APP_KEY=base64:" .env 2>/dev/null; then
-    php artisan key:generate --force
-fi
-
-if [ ! -d vendor ]; then
-    echo "Installing Composer dependencies..."
-    composer install --no-interaction --prefer-dist --optimize-autoloader
-fi
-
-# Ensure storage permissions
-chown -R www-data:www-data storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
-
-# Wait for database
-echo "Waiting for database connection..."
-until php -r "try { new PDO('mysql:host=' . env('DB_HOST', 'asopistar-db') . ';port=' . env('DB_PORT', 3306) . ';dbname=' . env('DB_DATABASE', 'asopistar_db'), env('DB_USERNAME', 'asopistar_user'), env('DB_PASSWORD', '***REMOVED***')); echo 'Database connected successfully.' . PHP_EOL; exit(0); } catch (Exception \$e) { exit(1); }"; do
-    sleep 2
-done
-
-# Run migrations and seed
 php artisan migrate --force
 php artisan db:seed --force
+if [ "${SEED_DEMO:-false}" = "true" ]; then
+    php artisan db:seed --class=DemoSeeder --force
+fi
+php artisan optimize
 
-echo "Starting PHP-FPM and Nginx..."
-php-fpm -D
-nginx -g "daemon off;"
+exec "$@"

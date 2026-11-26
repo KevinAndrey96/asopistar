@@ -2,38 +2,45 @@
 
 namespace Database\Factories;
 
+use App\Enums\Gender;
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+/**
+ * @extends Factory<User>
+ */
 class UserFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    protected static ?string $password;
+
+    public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'password' => static::$password ??= Hash::make('clave-de-prueba-1'),
+            'role' => Role::Farmer,
+            'document' => (string) fake()->unique()->numberBetween(10_000_000, 1_999_999_999),
+            'gender' => fake()->randomElement(Gender::cases()),
+            'phone' => '3'.fake()->numerify('#########'),
+            'estate' => 'Finca '.fake()->lastName(),
+            'vereda' => fake()->randomElement(['El Carmen', 'La Esperanza', 'San Isidro', 'Buenos Aires']),
+            'active' => true,
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory
-     */
-    public function unverified()
+    public function admin(): static
     {
-        return $this->state(function (array $attributes) {
-            return [
-                'email_verified_at' => null,
-            ];
-        });
+        return $this->state(fn () => ['role' => Role::Admin, 'gender' => null, 'estate' => null, 'vereda' => null]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn () => ['active' => false]);
     }
 }

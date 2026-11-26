@@ -3,45 +3,61 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
-class LoginController extends Controller
+final class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
+    private const int MAX_ATTEMPTS = 5;
 
-    use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
-    protected function redirectTo()
+    public function create(): View
     {
-        if (auth()->user()->rol == 'administrador') {
-            return '/admin';
-        }
-        return '/home';
+        return view('auth.login');
     }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function store(Request $request): RedirectResponse
     {
-        $this->middleware('guest')->except('logout');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        $key = 'login:'.Str::lower($credentials['email']).'|'.$request->ip();
+        if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
+            throw ValidationException::withMessages([
+                'email' => 'Demasiados intentos. Intenta de nuevo en '.RateLimiter::availableIn($key).' segundos.',
+            ]);
+        }
+
+        if (! Auth::attempt([...$credentials, 'active' => true], $request->boolean('remember'))) {
+            RateLimiter::hit($key);
+
+            throw ValidationException::withMessages(['email' => 'El correo o la contraseña no son correctos.']);
+        }
+
+        RateLimiter::clear($key);
+        $request->session()->regenerate();
+
+        return redirect()->intended(self::home($request->user()));
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+
+    public static function home(?User $user): string
+    {
+        return $user?->isAdmin() ? route('admin.dashboard') : route('farmer.dashboard');
     }
 }

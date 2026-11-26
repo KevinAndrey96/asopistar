@@ -1,196 +1,142 @@
-# asopistar-erp-platform: Enterprise Aquaculture & Fish Farming Management System
+# ERP piscícola en Laravel para asociaciones de piscicultores
 
-<div align="center">
+[![CI](https://github.com/KevinAndrey96/laravel-asopistar-aquaculture-erp/actions/workflows/ci.yml/badge.svg)](https://github.com/KevinAndrey96/laravel-asopistar-aquaculture-erp/actions/workflows/ci.yml)
+![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%20%7C%208.5-777BB4?logo=php&logoColor=white)
+![Laravel 13](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
+![Larastan nivel 8](https://img.shields.io/badge/Larastan-nivel%208-4F5B93)
+![Docker](https://img.shields.io/badge/Docker-listo-2496ED?logo=docker&logoColor=white)
 
-[![Laravel](https://img.shields.io/badge/Laravel-8.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
-[![MariaDB](https://img.shields.io/badge/MariaDB-10.11-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
-[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+**Bitácora digital y ERP para una asociación de piscicultores (Asopistar)**, hecha con Laravel 13, MariaDB y Tailwind CSS. Cada familia registra la siembra, la alimentación, las biometrías, la mortalidad, los tratamientos y la cosecha de sus estanques; la asociación ve en un solo tablero cuántos peces hay en agua, cuánta biomasa se proyecta cosechar y cómo rinde el alimento. Incluye un sitio público con productos, recetas y noticias.
 
-<p align="center">
-  <strong>Enterprise Aquaculture & Continental Fish Farming Management Platform (ERP). Engineered for fish farmer associations (Asociaciones de Piscicultores) to coordinate rural producers, track pond lifecycles, optimize feed conversion, monitor biometric growth, enforce cold-chain biosecurity, and record harvest yields.</strong>
-</p>
+![Bitácora de un ciclo de tilapia con peces en agua, peso promedio, biomasa y conversión alimenticia](docs/capturas/bitacora-ciclo.png)
 
-</div>
+## Qué hace
 
----
+- **Estanques y ciclos productivos:** cada estanque tiene a lo sumo un ciclo abierto. La siembra registra especie, proveedor de alevinos, cantidad y peso inicial; el sistema calcula la semana del ciclo y la etapa (**cría, levante o ceba**) según el calendario de la especie.
+- **Bitácora del ciclo:** alimentación (con la proteína del concentrado congelada en cada registro), biometrías con mortalidad, tratamientos sanitarios y cosechas con el **hielo de sacrificio, enfriamiento y transporte** para la cadena de frío.
+- **Indicadores calculados:** peces en agua, sobrevivencia, peso promedio, biomasa estimada, **factor de conversión alimenticia (FCR)** y semanas que faltan para la cosecha.
+- **Cierre del ciclo:** al cosechar todos los peces, al marcar la cosecha como final o con un cierre manual (lote perdido o trasladado). Un ciclo cerrado queda de solo lectura.
+- **Tablero de la asociación:** piscicultores activos por género, estanques, ciclos por etapa, producción por especie, cosecha proyectada a 4, 12 y 24 semanas y alimento consumido.
+- **Reportes PDF** del ciclo (para el piscicultor) y de la asociación (para la junta), generados con DomPDF.
+- **Administración:** piscicultores, especies con su calendario productivo, marcas de alimento, proveedores con **NIT validado con el dígito de verificación de la DIAN**, noticias, productos y recetas con fotos.
+- **Sitio público con SEO:** productos con precio en pesos, recetas con datos estructurados `Recipe`, noticias con `NewsArticle`, `sitemap.xml` y `robots.txt` dinámicos.
+- **Diseño adaptable:** en el celular las tablas se convierten en tarjetas.
 
-## 📌 Executive Summary & Real-World Domain
+| Panel del piscicultor | Tablero de la asociación |
+| :---: | :---: |
+| ![Panel del piscicultor con sus estanques, etapa de cada ciclo y peces en agua](docs/capturas/panel-piscicultor.png) | ![Resumen de la asociación con ciclos por etapa, cosecha proyectada y producción por especie](docs/capturas/resumen-asociacion.png) |
 
-In continental aquaculture, associations of small and mid-scale fish farmers (*Asociaciones de Piscicultores*) face significant operational challenges: decentralized record-keeping, unstandardized feeding regimens, disease vulnerability due to unmonitored water chemistry, and post-harvest biomass loss during road transit.
+| Sitio público | Piscicultores en el celular |
+| :---: | :---: |
+| ![Página de inicio pública con productos de la asociación](docs/capturas/sitio-publico.png) | ![Lista de piscicultores en un celular, en formato de tarjetas](docs/capturas/movil-piscicultores.png) |
 
-Originally engineered for the **Asociación de Piscicultores (Asopistar)** in Colombia, this platform transitions artisanal fish farming into a digitized, data-driven, and audit-compliant agricultural enterprise. The ERP unifies association governance with day-to-day farm operations across rural plots (*predios* and *veredas*), offering complete biological traceability from certified fingerling stocking (*siembra de alevinos*) through biometric growth sampling to cold-chain preservation and commercial harvest yields (*cosechas*).
+## Roles y permisos
 
----
+| Rol | Puede |
+| :--- | :--- |
+| **Piscicultor** | Registrar sus estanques, sembrar, llevar la bitácora de sus ciclos abiertos y descargar sus reportes. No ve los datos de otros asociados. |
+| **Administrador** | Gestionar piscicultores, catálogos y contenido público, y consultar en modo lectura cualquier estanque o ciclo. No escribe en la bitácora de un piscicultor. |
 
-## 🐟 Production Lifecycle & Architectural Pipeline
+No hay registro abierto: la asociación crea las cuentas. Las reglas viven en *policies* (`PondPolicy`, `CyclePolicy`) y en un middleware de rol; las rutas anidadas usan *scoped bindings*, de modo que un registro de otro ciclo responde 404.
 
-The platform enforces strict Role-Based Access Control (**Association Administrator** and **Fish Farmer / Producer**), coordinating every phase of the continental aquaculture supply chain:
+## Seguridad
 
-```mermaid
-flowchart TD
-    subgraph Governance["1. Association Governance & Master Data"]
-        A["Association Executive Portal"] --> B["Fish Farmer CRM (Rural Cadastre, Predios, Veredas)"]
-        A --> C["Species Taxonomy (Tilapia Roja, Cachama, Trucha, Bocachico)"]
-        A --> D["Feed Brands (Protein Content: 28% to 45%)"]
-        A --> E["Certified Genetics & Alevin Seed Suppliers"]
-    end
-    subgraph FarmOps["2. Pond Infrastructure & Production Cycle"]
-        F["Pond Cadastre (Compacted Earth vs HDPE Geomembrane)"] --> G["Fingerling Stocking (Alevin Batch Traceability)"]
-        G --> H["Daily Feeding Regimens (Alevinaje, Levante, Engorde)"]
-        H --> I["Biometric Growth Sampling (Mean Weight, Biomass, FCR)"]
-        I --> J["Water Biosecurity & Prophylaxis Treatments"]
-    end
-    subgraph Logistics["3. Post-Harvest & Cold-Chain Fulfillment"]
-        K["Ice & Cold Storage Ratios (Thermal Preservation)"] --> L["Harvest Yield Assessment (Net Biomass & Survival Rates)"]
-        L --> M["Commercial Distribution & Off-Takers"]
-    end
-    subgraph Intelligence["4. Regulatory Dossiers & Public Presence"]
-        N["Automated DomPDF Audit Dossiers (ICA & AUNAP Compliance)"]
-        O["Public Catalog, Gastronomic Recipes & Educational Blog"]
-    end
-    Governance --> FarmOps --> Logistics --> Intelligence
-```
+| Riesgo | Medida |
+| :--- | :--- |
+| Acceso a datos ajenos (IDOR) | Autorización por dueño en cada estanque, ciclo y registro; pruebas que cubren cada ruta con un usuario intruso. |
+| Asignación masiva | Form Requests con reglas explícitas; el dueño del estanque y el rol nunca salen del formulario. |
+| Datos inconsistentes | Fechas entre la siembra y hoy, mortalidad y cosecha limitadas a los peces que quedan, un solo ciclo abierto por estanque (con bloqueo de fila) y cierre no anterior al último registro. |
+| Fuerza bruta | 5 intentos por correo e IP y 20 por minuto por IP; mensaje genérico ante credenciales erradas. |
+| Cuentas desactivadas | No pueden ingresar y se cierra su sesión en la siguiente petición. |
+| Subidas maliciosas | Solo imágenes JPG, PNG o WebP de máximo 4 MB, con nombre aleatorio en el disco público; la foto anterior se borra al reemplazarla. |
+| XSS y clickjacking | Escape de Blade, Content Security Policy sin scripts en línea, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy` y `Permissions-Policy`. |
+| Caché de páginas privadas | `Cache-Control: no-store` en toda respuesta autenticada; sesión cifrada. |
+| Secretos | Ninguna credencial en el repositorio: `APP_KEY`, la contraseña de la base de datos y la de las cuentas demo se generan con `make env`. |
 
----
-
-## 🚀 Key Functional Modules
-
-### 1. Producer CRM & Rural Pond Cadastre
-- **Farmer Identity & Rural Georeferencing**: Catalogs associated producers with national tax identifiers, association membership codes, contact channels, and rural plot coordinates (*predios* and *veredas*).
-- **Pond Infrastructure Modeling**: Registers physical pond parameters including surface area ($m^2$), water column volume ($m^3$), construction typology (compacted clay/earth vs high-density polyethylene HDPE geomembranes), aeration assets (paddle wheels, splash aerators), and current operational states.
-
-### 2. Fingerling Stocking & Biological Seed Traceability
-- **Genetics Provenance**: Records incoming alevin batches, supplier genetics certification, quantity stocked, and stocking density per cubic meter.
-- **Taxonomic Multi-Species Support**: Built-in biological parameters for:
-  - **Tilapia Roja** (*Oreochromis sp.*)
-  - **Cachama Negra** (*Colossoma macropomum*)
-  - **Trucha Arcoiris** (*Oncorhynchus mykiss*)
-  - **Bocachico** (*Prochilodus magdalenae*)
-
-### 3. Nutrition Optimization & Biometric Growth Tracking
-- **Phased Nutrition Programs**: Logs daily feed rations segmented by production stage (*Alevinaje*, *Levante*, *Engorde*) and crude protein concentrations (28%, 32%, 38%, 45%).
-- **Biometric Sampling**: Computes sample counts and gross weights to calculate mean individual fish weight, total pond biomass, average daily weight gain (ADG), and Feed Conversion Ratios (FCR).
-
-### 4. Water Biosecurity & Prophylactic Health Records
-- **Sanitary Treatments**: Logs preventive and corrective chemical/organic prophylaxis (agricultural lime, sodium chloride/sea salt baths, formalin, bio-remediation probiotics).
-- **Physical-Chemical Logging**: Tracks dissolved oxygen, temperature, pH, and water transparency readings (Secchi disk depth).
-
-### 5. Post-Harvest Cold Chain & Commercial Harvest Yields
-- **Thermal Preservation Compliance**: Monitors ice-to-fish ratios during humane slaughter, initial chilling, and road dispatch to prevent spoilage and texture degradation.
-- **Harvest Yield Analytics**: Aggregates final harvest metrics: gross harvested biomass (kg), total piece counts, average harvest weight, pond survival percentages, and commercial distribution channels.
-
-### 6. Automated PDF Auditing & Regulatory Compliance
-- **DomPDF Inspection Dossiers**: Generates automated, vectorized PDF inspection certificates per individual pond or consolidated association summaries formatted for agricultural audit agencies (ICA, AUNAP).
-
----
-
-## 🛠️ Technology Stack & Engineering Specifications
-
-| Layer | Component | Specification |
-| :--- | :--- | :--- |
-| **Backend Framework** | Laravel 8.x | MVC architecture, Eloquent ORM, Service Layer, Seeders |
-| **Runtime** | PHP 8.1+ | Alpine Linux container, OPcache acceleration |
-| **Web Server** | Nginx | Reverse proxy with FastCGI process manager |
-| **Relational Database** | MariaDB 10.11 / MySQL 8.0 | InnoDB ACID transactions, foreign key constraints |
-| **PDF Engine** | Barryvdh Laravel DomPDF | Vectorized PDF reports and regulatory dossiers |
-| **Email Interception** | Mailpit | Local SMTP testbed and debugging interface |
-| **Containerization** | Docker & Docker Compose | Multi-container automated orchestration |
-
----
-
-## 📦 Containerized Quickstart (Docker Compose)
-
-The repository provides a turnkey, multi-container Docker Compose stack for instant local evaluation.
-
-### Prerequisites
-
-- **Docker Desktop** (version 20.10+ / Compose v2).
-- Ports `8094`, `8095`, `3312`, and `8026` available locally.
-
-### Installation & Launch
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/KevinAndrey96/asopistar-erp-platform.git
-cd asopistar-erp-platform
-
-# 2. Start the containerized environment
-docker compose up -d --build
-```
-
-The automated startup script will:
-1. Initialize the **MariaDB 10.11** database container with health verification.
-2. Build the **PHP 8.1 FPM + Nginx** application image.
-3. Execute all database migrations (`php artisan migrate --force`).
-4. Seed the database with a complete aquaculture operational dataset (`php artisan db:seed --force`).
-
----
-
-## 🌐 Port Mapping & Services
-
-| Service | Access URL | Port | Description |
-| :--- | :--- | :---: | :--- |
-| **Aquaculture ERP Web App** | [http://localhost:8094](http://localhost:8094) | `8094` | Main application and producer dashboard |
-| **phpMyAdmin** | [http://localhost:8095](http://localhost:8095) | `8095` | Visual database manager (User: `root`, Pass: `***REMOVED***`) |
-| **Mailpit Web UI** | [http://localhost:8026](http://localhost:8026) | `8026` | Local transactional email interceptor |
-| **MariaDB Server** | `localhost:3312` | `3312` | Direct relational database connection |
-
----
-
-## 🔑 Pre-Seeded Demo Credentials
-
-The database is pre-seeded with full operational test accounts:
-
-### 1. Association Administrator
-- **URL**: [http://localhost:8094/login](http://localhost:8094/login)
-- **Email**: `admin@asopistar.com`
-- **Password**: `***REMOVED***`
-- **Permissions**: Global association overview, producer catalog, species taxonomy, suppliers, feed brands, educational blogs, and recipes.
-
-### 2. Piscicultor / Fish Farmer
-- **URL**: [http://localhost:8094/login](http://localhost:8094/login)
-- **Email**: `piscicultor@asopistar.com`
-- **Password**: `***REMOVED***`
-- **Permissions**: Producer dashboard for Hacienda La Esperanza (Ponds EST-01 and EST-02), stocking records, daily feeding logs, biometric weight sampling, sanitary treatments, cold chain records, and PDF dossier downloads.
-
----
-
-## 📂 Repository Structure
+## Arquitectura
 
 ```text
-asopistar-erp-platform/
-├── app/
-│   ├── Http/Controllers/     # Controllers (Piscicultor, Pond, Alevin, Feeding, Harvest, etc.)
-│   └── Models/               # Eloquent Models (Pond, Specie, Alevin, Feeding, Weight, etc.)
-├── database/
-│   ├── migrations/           # 20 relational database migrations
-│   └── seeders/              # Comprehensive Aquaculture ERP database seeder
-├── docker/
-│   ├── nginx.conf            # Optimized Nginx virtual host
-│   └── entrypoint.sh         # Automated startup, migration, and seeder runner
-├── resources/
-│   └── views/                # Blade views (Ponds, Reports, Biometry, Admin dashboards)
-├── routes/
-│   └── web.php               # Protected and public application web routes
-├── docker-compose.yml        # Multi-container orchestration stack
-├── Dockerfile                # Production-ready PHP 8.1 FPM + Nginx Alpine image
-└── .env.example              # Sanitized configuration template
+app/
+├── Domain/
+│   ├── Aquaculture/   Etapas, calendario por especie y métricas del ciclo (sin Eloquent)
+│   └── Tax/           NIT colombiano con dígito de verificación
+├── Actions/           Casos de uso transaccionales: sembrar, cosechar, cerrar ciclo
+├── Policies/          Reglas de acceso por dueño y estado del ciclo
+├── Reports/           Agregados del tablero y del PDF de la asociación
+├── Http/
+│   ├── Controllers/   Sitio público, piscicultor y administración
+│   ├── Requests/      Validación con decimales en coma y mensajes en español
+│   └── Middleware/    Rol y cabeceras de seguridad
+├── Models/            Eloquent con relaciones, casts y agregados precargados
+└── Support/           Formato colombiano de cifras y almacenamiento de fotos
 ```
 
----
+```mermaid
+flowchart LR
+    S[Siembra] --> A[Alimentación]
+    A --> B[Biometría y mortalidad]
+    B --> A
+    B --> T[Tratamientos]
+    B --> C[Cosecha con hielo]
+    C -->|quedan peces| A
+    C -->|cosecha final| X[Ciclo cerrado]
+```
 
-## 📄 License
+Las métricas del ciclo (`CycleMetrics`) y el calendario de la especie (`SpeciesProfile`) son objetos de dominio puros, probados sin base de datos. El tablero precarga las sumas de alimento, mortalidad y cosecha con `withSum`, sin consultas N+1.
 
-This software is open-sourced under the [MIT License](LICENSE).
+## Puesta en marcha local
 
----
+Requisitos: Docker y `make`.
 
-## 👨‍💻 Author
+```bash
+make up    # crea .env con secretos aleatorios, construye la imagen y levanta la app con MariaDB 11.8
+make e2e   # prueba de humo contra el entorno levantado
+```
 
-**Kevin Andrey Herrera Silva**  
-*Senior Backend Engineer & Software Architect*  
-Bogotá, Colombia  
-- [GitHub](https://github.com/KevinAndrey96)  
-- [LinkedIn](https://www.linkedin.com/in/kevinandrey96/)  
+Abre <http://localhost:8080>. El arranque carga una asociación demo con cuatro asociados y ciclos en todas las etapas:
+
+| Cuenta | Rol |
+| :--- | :--- |
+| `admin@asopistar.test` | Administrador |
+| `piscicultor@asopistar.test` | Piscicultor |
+
+La contraseña de ambas es el valor de `DEMO_PASSWORD` en tu `.env` (`make env` la muestra al crearlo).
+
+## Despliegue
+
+La imagen `runtime` corre Apache como `www-data` en el puerto 8080, expone `/up` para el balanceador y en cada arranque aplica migraciones y catálogos base (especies, alimentos y proveedores). Variables principales:
+
+| Variable | Obligatoria | Descripción |
+| :--- | :---: | :--- |
+| `APP_KEY` | Sí | Clave de cifrado de Laravel (`base64:` + 32 bytes). |
+| `APP_URL` | Sí | URL pública; se usa en el sitemap y en las URL absolutas. |
+| `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Sí | Conexión a MariaDB o MySQL. |
+| `SEED_DEMO` | No | `true` carga la asociación demo; déjalo en `false` en producción. |
+| `APP_TRUST_PROXIES` | No | `true` solo detrás de un proxy que termine TLS. |
+| `SESSION_SECURE_COOKIE` | No | `true` cuando el sitio se sirve por HTTPS. |
+| `APP_TIMEZONE` | No | Zona horaria de los registros; por defecto `America/Bogota`. |
+
+Las fotos se guardan en `storage/app/public`, montado como volumen en `docker-compose.yml`.
+
+## Pruebas y calidad
+
+```bash
+make test    # PHPUnit dentro de la imagen de pruebas
+make check   # Pint, Larastan nivel 8 y PHPUnit
+```
+
+- **92 pruebas** unitarias y de integración: calendario y métricas del ciclo, NIT de la DIAN, formato colombiano, ingreso y bloqueo, autorización por dueño en cada ruta, ciclo de vida completo (siembra, bitácora, cosechas parciales y final, cierre), reportes PDF, catálogos, fotos, sitio público y cabeceras de seguridad.
+- **Prueba de extremo a extremo** en CI con Docker Compose y MariaDB real: sitio público, ingreso con token CSRF, bitácora, reporte PDF y bloqueo del área administrativa.
+- CI en PHP 8.4 y 8.5; Dependabot para Composer, npm, Docker y GitHub Actions.
+
+## Historia del proyecto
+
+La primera versión (2022) fue una aplicación Laravel 8 hecha para la asociación junto con [marjuliam](https://github.com/marjuliam): registro de estanques, alimentación, biometrías y reportes sobre una plantilla de administración. En 2026 la reescribí desde cero en Laravel 13 con el ciclo productivo como eje, autorización por dueño, validación de datos de campo, indicadores calculados, pruebas automatizadas y despliegue en contenedores. La versión original queda en la etiqueta `v0.1-legacy` como referencia.
+
+## Autor
+
+**Kevin Andrey Herrera Silva**, desarrollador backend. [GitHub](https://github.com/KevinAndrey96)
+
+## Licencia
+
+Sin licencia de código abierto. El proyecto nació como trabajo para un cliente y se publica como muestra de portafolio: todos los derechos reservados.

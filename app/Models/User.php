@@ -2,52 +2,68 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Gender;
+use App\Enums\Role;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $last_name
+ * @property string $email
+ * @property Role $role
+ * @property string $document
+ * @property string|null $member_code
+ * @property Gender|null $gender
+ * @property string|null $phone
+ * @property string|null $estate
+ * @property string|null $vereda
+ * @property bool $active
+ */
+#[Fillable(['name', 'last_name', 'email', 'password', 'role', 'document', 'member_code', 'gender', 'phone', 'estate', 'vereda', 'active'])]
+#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'role' => Role::class,
+            'gender' => Gender::class,
+            'active' => 'boolean',
+        ];
+    }
+
+    /** @return HasMany<Pond, $this> */
+    public function ponds(): HasMany
+    {
+        return $this->hasMany(Pond::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::Admin;
+    }
+
+    public function fullName(): string
+    {
+        return $this->name.' '.$this->last_name;
+    }
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * @param  Builder<self>  $query
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'code',
-        'estate',//predio
-        'sidewalk',//vereda
-        'rol',
-        //'is_enabled',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /*public function getRol(){
-        return $this->belongsTo('App\Models\Rol');
-    }*/
+    public function scopeFarmers(Builder $query): void
+    {
+        $query->where('role', Role::Farmer->value);
+    }
 }

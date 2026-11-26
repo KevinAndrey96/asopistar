@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  laravel:
+    name: Laravel (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.4", "8.5"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, pdo_sqlite, zip
+          coverage: none
+      - run: composer validate --strict
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - run: vendor/bin/pint --test
+      - run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+      - run: vendor/bin/phpunit
+      - uses: actions/setup-node@v7
+        if: matrix.php == '8.4'
+        with:
+          node-version: 24
+          cache: npm
+      - if: matrix.php == '8.4'
+        run: npm ci && npm run build
+
+  compose:
+    name: Entorno Docker completo
+    runs-on: ubuntu-latest
+    needs: laravel
+    steps:
+      - uses: actions/checkout@v7
+      - run: make env
+      - run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Flujo de punta a punta
+        run: ./docker/e2e.sh
+      - if: failure()
+        run: docker compose logs
